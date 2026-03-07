@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DASHBOARD</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@500&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Rajdhani',sans-serif;
+}
+
+body{
+background:#050505;
+color:white;
+display:flex;
+flex-direction:column;
+min-height:100vh;
+}
+
+/* NAVBAR */
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:16px;
+background:#0b0b0b;
+border-bottom:1px solid #222;
+position:relative;
+}
+
+.title{
+font-family:'Orbitron';
+font-weight:700;
+color:#ffcc00;
+}
+
+.menu{
+font-size:24px;
+cursor:pointer;
+}
+
+/* DROPDOWN */
+
+.dropdown{
+position:absolute;
+top:60px;
+right:10px;
+background:#111;
+border:1px solid #222;
+border-radius:10px;
+display:none;
+flex-direction:column;
+width:200px;
+z-index:100;
+}
+
+.dropdown a{
+padding:12px;
+border-bottom:1px solid #222;
+text-decoration:none;
+color:#aaa;
+}
+
+.dropdown a:hover{
+background:#1a1a1a;
+color:#ffcc00;
+}
+
+/* CONTAINER */
+
+.container{
+flex:1;
+max-width:450px;
+width:100%;
+margin:auto;
+padding:15px;
+}
+
+/* CARD */
+
+.card{
+background:#111;
+padding:18px;
+border-radius:15px;
+border:1px solid #222;
+margin-bottom:15px;
+}
+
+/* INPUT */
+
+input,select{
+width:100%;
+padding:14px;
+border-radius:10px;
+border:1px solid #333;
+background:#000;
+color:white;
+margin-bottom:10px;
+}
+
+/* OPTION BUTTON */
+
+.option-row{
+display:flex;
+gap:10px;
+}
+
+.option-btn{
+flex:1;
+padding:12px;
+border-radius:20px;
+border:1px solid #333;
+background:#151515;
+text-align:center;
+cursor:pointer;
+transition:.3s;
+}
+
+.option-btn.active{
+background:linear-gradient(45deg,#ff0044,#7b00ff);
+}
+
+/* START */
+
+.start-btn{
+margin-top:12px;
+width:100%;
+padding:16px;
+border-radius:25px;
+border:none;
+background:linear-gradient(45deg,#ff0044,#7b00ff);
+color:white;
+font-family:'Orbitron';
+font-weight:700;
+cursor:pointer;
+}
+
+/* STATUS */
+
+.status{
+margin-top:10px;
+background:#0d0d0d;
+border:1px solid #222;
+padding:12px;
+border-radius:12px;
+text-align:center;
+color:#00ff88;
+}
+
+/* TERMINAL */
+
+.log-box{
+margin-top:12px;
+height:120px;
+background:#000;
+border:1px solid #222;
+border-radius:12px;
+padding:10px;
+font-family:monospace;
+font-size:12px;
+overflow:auto;
+color:#00ff00;
+}
+
+/* BOT STATUS */
+
+.bot-section{
+margin-top:12px;
+display:flex;
+gap:10px;
+}
+
+.bot-box{
+flex:1;
+background:#111;
+padding:15px;
+border-radius:12px;
+text-align:center;
+border:1px solid #222;
+}
+
+.live{
+color:#00ff88;
+font-size:18px;
+}
+
+.busy{
+color:#ff4444;
+font-size:18px;
+}
+
+/* TAGLINE BAR */
+
+.tagline-bar{
+margin-top:12px;
+background:#0b0b0b;
+border:1px solid #222;
+border-radius:10px;
+padding:10px;
+text-align:center;
+font-size:12px;
+color:#aaa;
+}
+
+/* FOOTER */
+
+.footer{
+text-align:center;
+padding:12px;
+background:#0b0b0b;
+border-top:1px solid #222;
+font-size:12px;
+color:#777;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+
+<div class="title">👑 ZEXI BOT</div>
+
+<div class="menu" onclick="toggleMenu()">☰</div>
+
+<div class="dropdown" id="menu">
+
+<a href="rankbot.html">Rank Push Bot</a>
+<a href="diamond.html">Buy Discount Diamond</a>
+
+</div>
+
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<input type="number" placeholder="Enter Guild UID">
+
+<select>
+<option>Select Region</option>
+<option>India</option>
+<option>Bangladesh</option>
+<option>Pakistan</option>
+<option>Brazil</option>
+</select>
+
+<select>
+<option>Select Device</option>
+<option>Android</option>
+<option>iOS</option>
+</select>
+
+<div class="option-row">
+<div class="option-btn" onclick="toggleOption(this)">FF </div>
+<div class="option-btn" onclick="toggleOption(this)">MEX </div>
+</div>
+
+<button class="start-btn" onclick="startPanel()">START</button>
+
+</div>
+
+<div class="status">
+SYSTEM STATUS: READY
+</div>
+
+<div class="log-box" id="terminal">
+> Initializing system...<br>
+</div>
+
+<div class="bot-section">
+
+<div class="bot-box">
+<div>Live Bots</div>
+<div class="live" id="liveBots">10</div>
+</div>
+
+<div class="bot-box">
+<div>Busy Bots</div>
+<div class="busy" id="busyBots">2</div>
+</div>
+
+</div>
+
+<div class="tagline-bar">
+⚡ Secure Server • 🤖 Auto Bots • 🚀 Fast Processing
+</div>
+
+</div>
+
+<div class="footer">
+© 2026 ZEXI BOT PANEL
+</div>
+
+<script>
+
+function toggleMenu(){
+let menu=document.getElementById("menu")
+menu.style.display = menu.style.display==="flex" ? "none":"flex"
+}
+
+/* option toggle */
+
+function toggleOption(el){
+el.classList.toggle("active")
+}
+
+/* start redirect */
+
+function startPanel(){
+window.location.href="plan.html"
+}
+
+/* terminal logs */
+
+const logs=[
+"Connecting to server...",
+"Checking security...",
+"Loading bot modules...",
+"Syncing region data...",
+"System ready..."
+]
+
+setInterval(()=>{
+let term=document.getElementById("terminal")
+term.innerHTML+="> "+logs[Math.floor(Math.random()*logs.length)]+"<br>"
+term.scrollTop=term.scrollHeight
+},2000)
+
+/* random bot counters */
+
+setInterval(()=>{
+
+let live=Math.floor(Math.random()*20)+5
+let busy=Math.floor(Math.random()*10)+1
+
+document.getElementById("liveBots").innerText=live
+document.getElementById("busyBots").innerText=busy
+
+},3000)
+
+/* SECURITY */
+
+document.addEventListener("contextmenu",e=>e.preventDefault());
+
+document.onkeydown=function(e){
+
+if(e.keyCode==123) return false;
+
+if(e.ctrlKey && e.shiftKey && e.keyCode==73) return false;
+
+if(e.ctrlKey && e.keyCode==85) return false;
+
+if(e.ctrlKey && e.keyCode==83) return false;
+
+};
+
+setInterval(function(){
+
+if(window.outerWidth-window.innerWidth>200){
+
+document.body.innerHTML="Access Denied";
+
+}
+
+},1000);
+
+</script>
+
+</body>
+</html>
