@@ -16,12 +16,12 @@
         .brand-text { color: #d4c19d; font-weight: 600; }
         .toggle-container { display: flex; background-color: #121212; padding: 6px; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #2a2a2a; }
         .tab-btn { flex: 1; padding: 12px; background-color: transparent; color: #888; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; }
-        .tab-btn.active-si { background-color: #2563eb; color: #ffffff; }
-        .tab-btn.active-su { background-color: #10b981; color: #ffffff; }
+        .active-si { background-color: #2563eb !important; color: #ffffff !important; }
+        .active-su { background-color: #10b981 !important; color: #ffffff !important; }
         .input-group { text-align: left; margin-bottom: 1.2rem; }
         .input-group label { font-size: 11px; text-transform: uppercase; color: #555; margin-left: 5px; display: block; margin-bottom: 5px; }
         .custom-input { width: 100%; padding: 14px 18px; background-color: #121212; border: 1px solid #2a2a2a; border-radius: 14px; color: #ffffff; font-size: 1rem; }
-        .main-submit { width: 100%; padding: 16px; background-color: #d4c19d; border-radius: 14px; color: black; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .main-submit { width: 100%; padding: 16px; background-color: #d4c19d; border-radius: 14px; color: black; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; margin-top: 10px; }
         .contact-section { margin-top: 2.5rem; }
         .contact-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; border-radius: 14px; margin-bottom: 10px; text-decoration: none; font-weight: 600; }
         .whatsapp { background-color: #133a20; color: #4ade80; border: 1px solid #22543d; }
@@ -58,7 +58,9 @@
 
             <div class="cf-turnstile" data-sitekey="0x4AAAAAACoC7U-5eZCob0QC" data-theme="dark" style="margin-bottom: 15px;"></div>
 
-            <button type="submit" class="main-submit" id="submit-btn">Sign In</button>
+            <button type="submit" class="main-submit" id="submit-btn">
+                <span id="btn-text">Sign In</span>
+            </button>
         </form>
 
         <div class="contact-section">
@@ -71,18 +73,20 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-        const firebaseConfig = {
+        const auth = getAuth(initializeApp({
             apiKey: "AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
             authDomain: "zexi-bot.firebaseapp.com",
             projectId: "zexi-bot",
             storageBucket: "zexi-bot.firebasestorage.app",
             messagingSenderId: "245993811972",
             appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
-        };
-        const auth = getAuth(initializeApp(firebaseConfig));
+        }));
 
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const token = turnstile.getResponse();
+            if (!token) { return alert("Please complete verification!"); }
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirm = document.getElementById('confirm-password').value;
@@ -93,7 +97,8 @@
             try {
                 if(isLogin) await signInWithEmailAndPassword(auth, email, password);
                 else await createUserWithEmailAndPassword(auth, email, password);
-                alert("Success!");
+                alert("Success! Redirecting...");
+                window.location.href = "dashboard.html";
             } catch(err) { alert(err.message); }
         });
     </script>
@@ -102,15 +107,22 @@
         function switchTab(mode) {
             const title = document.getElementById('page-title');
             const confirm = document.getElementById('container-confirm');
-            const submit = document.getElementById('submit-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnSi = document.getElementById('btn-si');
+            const btnSu = document.getElementById('btn-su');
+
             if (mode === 'signup') {
                 title.innerText = "Create Account";
                 confirm.style.display = 'block';
-                submit.innerText = "Create Account";
+                btnText.innerText = "Create Account";
+                btnSu.classList.add('active-su');
+                btnSi.classList.remove('active-si');
             } else {
                 title.innerText = "Welcome Back";
                 confirm.style.display = 'none';
-                submit.innerText = "Sign In";
+                btnText.innerText = "Sign In";
+                btnSi.classList.add('active-si');
+                btnSu.classList.remove('active-su');
             }
         }
     </script>
