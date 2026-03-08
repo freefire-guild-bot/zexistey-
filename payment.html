@@ -282,12 +282,10 @@ color:#777;
 <body>
 
 <div class="top-bar">
-
 <div class="jacky">👑 ZEXI BOT</div>
-
 <div class="menu-btn" onclick="toggleMenu()">☰</div>
-
-
+<div class="dropdown" id="menu"></div>
+</div>
 
 <div class="bg-glow"></div>
 
@@ -318,8 +316,8 @@ color:#777;
 </div>
 
 <div class="input-box">
-<label>ENTER 12-DIGIT UTR / REF NO.</label>
-<input type="text" id="utr" maxlength="12">
+<label>ENTER UTR / REF NO.</label>
+<input type="text" id="utr">
 </div>
 
 <button class="pay-btn" onclick="startVerify()">VERIFY TRANSACTION</button>
@@ -343,34 +341,24 @@ Partners: NovaTech • SkyLabs • QuantumHost • CyberEdge
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-
-import {
-getFirestore,
-collection,
-addDoc
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
-  authDomain: "zexi-bot.firebaseapp.com",
-  projectId: "zexi-bot",
-  storageBucket: "zexi-bot.firebasestorage.app",
-  messagingSenderId: "245993811972",
-  appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
+apiKey:"AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
+authDomain:"zexi-bot.firebaseapp.com",
+projectId:"zexi-bot",
+storageBucket:"zexi-bot.firebasestorage.app",
+messagingSenderId:"245993811972",
+appId:"1:245993811972:web:e25ed7ef03d118a4fd8551"
 };
 
-const app = initializeApp(firebaseConfig);
-
-const db = getFirestore(app);
-
-/* MENU */
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
 
 window.toggleMenu=function(){
 let menu=document.getElementById("menu")
 menu.style.display = menu.style.display==="flex" ? "none":"flex"
 }
-
-/* PLAN DATA */
 
 const params=new URLSearchParams(window.location.search);
 const plan=params.get('plan')||"VIP Tier";
@@ -389,8 +377,6 @@ window.openUpiApp=function(){
 window.location.href=upiUri;
 }
 
-/* TIMER */
-
 let time=300;
 
 setInterval(()=>{
@@ -400,37 +386,30 @@ document.getElementById('timer').innerText=`0${m}:${s<10?'0':''}${s}`;
 if(time>0)time--;
 },1000);
 
-/* LIVE USERS */
-
 setInterval(()=>{
 document.getElementById("users").innerText=Math.floor(Math.random()*200)+100
 },4000);
-
-/* VERIFY PAYMENT */
 
 window.startVerify=async function(){
 
 const utrValue=document.getElementById('utr').value;
 
-if(utrValue.length<12){
-alert("⚠️ Error: UTR must be exactly 12 digits.");
+if(!utrValue){
+alert("⚠️ Please enter UTR / Reference number.");
 return;
 }
 
 try{
 
 await addDoc(collection(db,"payments"),{
-
 plan:plan,
 amount:price,
 utr:utrValue,
 status:"Pending",
 time:Date.now()
-
 });
 
 alert("Payment request submitted. Waiting for admin approval.");
-
 window.location.href="request.html";
 
 }
@@ -438,18 +417,11 @@ window.location.href="request.html";
 catch(error){
 
 alert("Error submitting request");
-
 console.error(error);
 
 }
 
 }
-
-/* UTR FILTER */
-
-document.getElementById('utr').addEventListener('input',function(){
-this.value=this.value.replace(/[^0-9]/g,'');
-});
 
 </script>
 
