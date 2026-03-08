@@ -16,14 +16,17 @@
         .brand-text { color: #d4c19d; font-weight: 600; }
         .toggle-container { display: flex; background-color: #121212; padding: 6px; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #2a2a2a; }
         .tab-btn { flex: 1; padding: 12px; background-color: transparent; color: #888; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; }
-        .active-si { background-color: #2563eb !important; color: #ffffff !important; }
-        .active-su { background-color: #10b981 !important; color: #ffffff !important; }
+        .tab-btn.active-si { background-color: #2563eb; color: #ffffff; }
+        .tab-btn.active-su { background-color: #10b981; color: #ffffff; }
         .input-group { text-align: left; margin-bottom: 1.2rem; }
         .input-group label { font-size: 11px; text-transform: uppercase; color: #555; margin-left: 5px; display: block; margin-bottom: 5px; }
-        .custom-input { width: 100%; padding: 14px 18px; background-color: #121212; border: 1px solid #2a2a2a; border-radius: 14px; color: #ffffff; font-size: 1rem; }
-        .main-submit { width: 100%; padding: 16px; background-color: #d4c19d; border-radius: 14px; color: black; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; margin-top: 10px; }
+        .custom-input { width: 100%; padding: 14px 18px; background-color: #121212; border: 1px solid #2a2a2a; border-radius: 14px; color: #ffffff; font-size: 1rem; transition: border-color 0.3s; }
+        .custom-input:focus { border-color: #d4c19d; }
+        .main-submit { width: 100%; padding: 16px; background-color: #d4c19d; border-radius: 14px; color: black; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.2s; }
+        .main-submit:active { transform: scale(0.96); }
         .contact-section { margin-top: 2.5rem; }
-        .contact-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; border-radius: 14px; margin-bottom: 10px; text-decoration: none; font-weight: 600; }
+        .contact-title { color: #555; font-size: 0.9rem; margin-bottom: 0.8rem; }
+        .contact-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; border-radius: 14px; margin-bottom: 10px; text-decoration: none; font-weight: 600; transition: background 0.3s; }
         .whatsapp { background-color: #133a20; color: #4ade80; border: 1px solid #22543d; }
         .telegram { background-color: #1a3d54; color: #38bdf8; border: 1px solid #2c5282; }
     </style>
@@ -34,6 +37,7 @@
         <div class="logo-container">
             <svg width="34" height="34" viewBox="0 0 24 24" fill="black"><path d="M13 10V3L4 14H11V21L20 10H13Z"/></svg>
         </div>
+
         <h1 class="main-title" id="page-title">Welcome Back</h1>
         <p class="sub-title" id="page-subtitle">Sign in to <span class="brand-text">ZEXIBOT</span> panel</p>
 
@@ -56,14 +60,15 @@
                 <input type="password" id="confirm-password" class="custom-input" placeholder="Confirm your password">
             </div>
 
-            <div class="cf-turnstile" data-sitekey="0x4AAAAAACoC7U-5eZCob0QC" data-theme="dark" style="margin-bottom: 15px;"></div>
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAACoC7U-5eZCob0QC" data-theme="dark" style="margin-bottom: 1rem;"></div>
 
             <button type="submit" class="main-submit" id="submit-btn">
-                <span id="btn-text">Sign In</span>
+                <span id="submit-text">Sign In</span>
             </button>
         </form>
 
         <div class="contact-section">
+            <p class="contact-title">Need help? Contact Admin</p>
             <a href="#" class="contact-btn whatsapp">WhatsApp</a>
             <a href="#" class="contact-btn telegram">Telegram</a>
         </div>
@@ -73,14 +78,15 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-        const auth = getAuth(initializeApp({
+        const firebaseConfig = {
             apiKey: "AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
             authDomain: "zexi-bot.firebaseapp.com",
             projectId: "zexi-bot",
             storageBucket: "zexi-bot.firebasestorage.app",
             messagingSenderId: "245993811972",
             appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
-        }));
+        };
+        const auth = getAuth(initializeApp(firebaseConfig));
 
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -97,6 +103,7 @@
             try {
                 if(isLogin) await signInWithEmailAndPassword(auth, email, password);
                 else await createUserWithEmailAndPassword(auth, email, password);
+                
                 alert("Success! Redirecting...");
                 window.location.href = "dashboard.html";
             } catch(err) { alert(err.message); }
@@ -106,23 +113,26 @@
     <script>
         function switchTab(mode) {
             const title = document.getElementById('page-title');
-            const confirm = document.getElementById('container-confirm');
-            const btnText = document.getElementById('btn-text');
+            const subtitle = document.getElementById('page-subtitle');
             const btnSi = document.getElementById('btn-si');
             const btnSu = document.getElementById('btn-su');
+            const confirm = document.getElementById('container-confirm');
+            const submitText = document.getElementById('submit-text');
 
             if (mode === 'signup') {
                 title.innerText = "Create Account";
+                subtitle.innerHTML = 'Join <span class="brand-text">ZEXIBOT</span> panel';
+                btnSu.className = "tab-btn active-su";
+                btnSi.className = "tab-btn";
                 confirm.style.display = 'block';
-                btnText.innerText = "Create Account";
-                btnSu.classList.add('active-su');
-                btnSi.classList.remove('active-si');
+                submitText.innerText = "Create Account";
             } else {
                 title.innerText = "Welcome Back";
+                subtitle.innerHTML = 'Sign in to <span class="brand-text">ZEXIBOT</span> panel';
+                btnSi.className = "tab-btn active-si";
+                btnSu.className = "tab-btn";
                 confirm.style.display = 'none';
-                btnText.innerText = "Sign In";
-                btnSi.classList.add('active-si');
-                btnSu.classList.remove('active-su');
+                submitText.innerText = "Sign In";
             }
         }
     </script>
