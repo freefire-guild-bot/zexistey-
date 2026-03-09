@@ -47,32 +47,6 @@ font-size:24px;
 cursor:pointer;
 }
 
-/* DROPDOWN */
-
-.dropdown{
-position:absolute;
-right:10px;
-top:55px;
-background:#111;
-border:1px solid #333;
-border-radius:8px;
-display:none;
-flex-direction:column;
-width:180px;
-}
-
-.dropdown a{
-padding:12px;
-color:#aaa;
-text-decoration:none;
-border-bottom:1px solid #222;
-}
-
-.dropdown a:hover{
-background:#1a1a1a;
-color:#ffcc00;
-}
-
 /* HEADER */
 
 .header{
@@ -100,8 +74,6 @@ margin-bottom:15px;
 box-shadow:0 0 10px rgba(0,0,0,0.5);
 }
 
-/* DOUBLE LINE INFO */
-
 .req-row{
 display:flex;
 justify-content:space-between;
@@ -110,38 +82,11 @@ margin-bottom:6px;
 color:#aaa;
 }
 
-.req-actions{
-display:flex;
-gap:10px;
-margin-top:10px;
-}
-
-button{
-padding:10px 15px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-font-weight:600;
-font-size:13px;
-}
-
-.approve{
-background:#00c853;
-color:white;
-}
-
-.cancel{
-background:#ff3d00;
-color:white;
-}
-
 .status{
 margin-top:8px;
 font-size:12px;
 color:#999;
 }
-
-/* FOOTER */
 
 .footer{
 text-align:center;
@@ -157,23 +102,8 @@ color:#777;
 
 <body>
 
-<!-- TOP BAR -->
-
 <div class="top-bar">
-
 <div class="logo">👑 ZEXI BOT</div>
-
-<div class="menu" onclick="toggleMenu()">☰</div>
-
-<div class="dropdown" id="menu">
-
-
-
-
-
-
-</div>
-
 </div>
 
 <div class="header">
@@ -181,17 +111,13 @@ USER PAYMENT REQUESTS
 </div>
 
 <div class="container">
-
 <div id="requests"></div>
-
 </div>
 
 <div class="footer">
-
 © 2026 ZEXI BOT PANEL  
 <br>
 Secure Gaming Services
-
 </div>
 
 <script type="module">
@@ -201,48 +127,57 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/fireba
 import {
 getFirestore,
 collection,
+query,
+where,
 getDocs
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
+import {
+getAuth
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
-  authDomain: "zexi-bot.firebaseapp.com",
-  projectId: "zexi-bot",
-  storageBucket: "zexi-bot.firebasestorage.app",
-  messagingSenderId: "245993811972",
-  appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
+apiKey: "AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
+authDomain: "zexi-bot.firebaseapp.com",
+projectId: "zexi-bot",
+storageBucket: "zexi-bot.firebasestorage.app",
+messagingSenderId: "245993811972",
+appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
 };
 
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-/* MENU */
+const auth = getAuth(app);
 
-window.toggleMenu=function(){
-
-let menu=document.getElementById("menu")
-
-menu.style.display = menu.style.display==="flex" ? "none":"flex"
-
-}
-
-/* LOAD REQUESTS FROM FIREBASE */
+/* LOAD USER REQUESTS */
 
 async function renderRequests(){
+
+const user = auth.currentUser;
 
 const container = document.getElementById("requests");
 
 container.innerHTML="";
 
-const querySnapshot = await getDocs(collection(db,"payments"));
+if(!user){
+container.innerHTML="<p style='color:#777'>Please login first</p>";
+return;
+}
+
+/* filter user requests */
+
+const q = query(
+collection(db,"payments"),
+where("user","==",user.email)
+);
+
+const querySnapshot = await getDocs(q);
 
 if(querySnapshot.empty){
-
 container.innerHTML="<p style='color:#777'>No requests yet</p>";
-
 return;
-
 }
 
 querySnapshot.forEach((doc)=>{
@@ -271,7 +206,7 @@ container.appendChild(div);
 
 }
 
-renderRequests();
+setTimeout(renderRequests,1000);
 
 </script>
 
