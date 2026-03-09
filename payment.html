@@ -341,7 +341,17 @@ Partners: NovaTech • SkyLabs • QuantumHost • CyberEdge
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+import { 
+getFirestore, 
+collection, 
+addDoc 
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+import { 
+getAuth,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
 const firebaseConfig = {
 apiKey:"AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
@@ -352,13 +362,30 @@ messagingSenderId:"245993811972",
 appId:"1:245993811972:web:e25ed7ef03d118a4fd8551"
 };
 
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUser = null;
+
+/* USER LOGIN CHECK */
+
+onAuthStateChanged(auth,(user)=>{
+
+if(user){
+currentUser = user;
+}
+
+});
+
+/* MENU */
 
 window.toggleMenu=function(){
 let menu=document.getElementById("menu")
 menu.style.display = menu.style.display==="flex" ? "none":"flex"
 }
+
+/* PLAN DATA */
 
 const params=new URLSearchParams(window.location.search);
 const plan=params.get('plan')||"VIP Tier";
@@ -377,6 +404,8 @@ window.openUpiApp=function(){
 window.location.href=upiUri;
 }
 
+/* TIMER */
+
 let time=300;
 
 setInterval(()=>{
@@ -386,9 +415,13 @@ document.getElementById('timer').innerText=`0${m}:${s<10?'0':''}${s}`;
 if(time>0)time--;
 },1000);
 
+/* LIVE USERS */
+
 setInterval(()=>{
 document.getElementById("users").innerText=Math.floor(Math.random()*200)+100
 },4000);
+
+/* VERIFY PAYMENT */
 
 window.startVerify=async function(){
 
@@ -399,17 +432,26 @@ alert("⚠️ Please enter UTR / Reference number.");
 return;
 }
 
+if(!currentUser){
+alert("Please login first");
+return;
+}
+
 try{
 
 await addDoc(collection(db,"payments"),{
+
 plan:plan,
 amount:price,
 utr:utrValue,
 status:"Pending",
+user:currentUser.email,   // 🔥 important
 time:Date.now()
+
 });
 
 alert("Payment request submitted. Waiting for admin approval.");
+
 window.location.href="request.html";
 
 }
