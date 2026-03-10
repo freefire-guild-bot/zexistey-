@@ -244,22 +244,23 @@ const auth=getAuth(app);
 
 async function loadWallet(uid){
 
-const ref=doc(db,"users",uid);
+const ref = doc(db,"users",uid);
 
-const snap=await getDoc(ref);
+const snap = await getDoc(ref);
 
 if(snap.exists()){
 
-document.getElementById("walletBalance").innerText=
-"₹"+(snap.data().wallet||0);
+document.getElementById("walletBalance").innerText =
+(snap.data().wallet || 0) + " Credits";
 
 }else{
-document.getElementById("walletBalance").innerText = wallet + " Credits";
+
+document.getElementById("walletBalance").innerText =
+"0 Credits";
 
 }
 
 }
-
 /* LOAD HISTORY */
 
 async function loadHistory(userId){
