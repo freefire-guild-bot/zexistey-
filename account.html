@@ -412,7 +412,8 @@ import {
 getFirestore,
 doc,
 getDoc,
-setDoc
+setDoc,
+updateDoc
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 import {
@@ -438,29 +439,27 @@ const db = getFirestore(app);
 
 const auth = getAuth(app);
 
+
 /* USER LOAD */
 
 onAuthStateChanged(auth, async(user)=>{
 
 if(!user){
 
-/* अगर login नहीं है तो login page पर भेज दो */
-
 window.location.href="login.html";
-
 return;
 
 }
 
 /* EMAIL SHOW */
 
-document.getElementById("userEmail").innerText=user.email;
+document.getElementById("userEmail").innerText = user.email;
 
 /* USER ID */
 
-document.getElementById("userId").innerText=user.uid;
+document.getElementById("userId").innerText = user.uid;
 
-/* WALLET LOAD */
+/* USER DOCUMENT */
 
 const ref = doc(db,"users",user.uid);
 
@@ -468,32 +467,56 @@ const snap = await getDoc(ref);
 
 let wallet = 0;
 
-if(snap.exists()){
+/* अगर user document नहीं है तो create करो */
 
-wallet = snap.data().wallet || 0;
-
-}else{
-
-wallet = 0;
+if(!snap.exists()){
 
 await setDoc(ref,{
 email:user.email,
-wallet:0
+wallet:0,
+online:true,
+lastLogin:new Date()
+});
+
+wallet = 0;
+
+}else{
+
+wallet = snap.data().wallet || 0;
+
+/* login update */
+
+await updateDoc(ref,{
+online:true,
+lastLogin:new Date()
 });
 
 }
 
-document.getElementById("walletBalance").innerText="₹"+wallet;
+/* WALLET SHOW */
+
+document.getElementById("walletBalance").innerText = "₹"+wallet;
 
 });
 
-/* LOGOUT BUTTON */
 
-document.getElementById("logoutBtn").onclick=async function(){
+/* LOGOUT */
+
+document.getElementById("logoutBtn").onclick = async function(){
+
+const user = auth.currentUser;
+
+if(user){
+
+await updateDoc(doc(db,"users",user.uid),{
+online:false
+});
+
+}
 
 await signOut(auth);
 
-window.location.href="login.html";
+window.location.href = "login.html";
 
 }
 
@@ -528,7 +551,7 @@ window.location.href="login.html";
 
 /* Example Email (Backend Replace) */
 
-document.getElementById("userEmail").innerText="user@email.com";
+
 
 </script>
 
