@@ -75,40 +75,124 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
-            authDomain: "zexi-bot.firebaseapp.com",
-            projectId: "zexi-bot",
-            storageBucket: "zexi-bot.firebasestorage.app",
-            messagingSenderId: "245993811972",
-            appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
-        };
-        const auth = getAuth(initializeApp(firebaseConfig));
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 
-        document.getElementById('auth-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const token = turnstile.getResponse();
-            if (!token) { return alert("Please complete verification!"); }
+import {
+getAuth,
+signInWithEmailAndPassword,
+createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirm = document.getElementById('confirm-password').value;
-            const isLogin = document.getElementById('page-title').innerText === "Welcome Back";
+import {
+getFirestore,
+doc,
+setDoc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-            if(!isLogin && password !== confirm) { return alert("Passwords do not match!"); }
+const firebaseConfig = {
+apiKey: "AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
+authDomain: "zexi-bot.firebaseapp.com",
+projectId: "zexi-bot",
+storageBucket: "zexi-bot.firebasestorage.app",
+messagingSenderId: "245993811972",
+appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
+};
 
-            try {
-                if(isLogin) await signInWithEmailAndPassword(auth, email, password);
-                else await createUserWithEmailAndPassword(auth, email, password);
-                
-                alert("Success! Redirecting...");
-                window.location.href = "dashboard.html";
-            } catch(err) { alert(err.message); }
-        });
-    </script>
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+
+
+document.getElementById('auth-form').addEventListener('submit', async (e) => {
+
+e.preventDefault();
+
+const token = turnstile.getResponse();
+
+if (!token) {
+
+return alert("Please complete verification!");
+
+}
+
+const email = document.getElementById('email').value;
+
+const password = document.getElementById('password').value;
+
+const confirm = document.getElementById('confirm-password').value;
+
+const isLogin = document.getElementById('page-title').innerText === "Welcome Back";
+
+
+
+try {
+
+if(isLogin){
+
+/* LOGIN */
+
+const userCredential = await signInWithEmailAndPassword(auth,email,password);
+
+const user = userCredential.user;
+
+/* UPDATE ONLINE */
+
+await updateDoc(doc(db,"users",user.uid),{
+
+online:true,
+lastLogin:new Date()
+
+});
+
+alert("Login Success");
+
+window.location.href="dashboard.html";
+
+}else{
+
+/* REGISTER */
+
+if(password !== confirm){
+
+return alert("Passwords do not match!");
+
+}
+
+const userCredential = await createUserWithEmailAndPassword(auth,email,password);
+
+const user = userCredential.user;
+
+/* CREATE USER DOCUMENT */
+
+await setDoc(doc(db,"users",user.uid),{
+
+email:user.email,
+wallet:20,
+online:true,
+lastLogin:new Date()
+
+});
+
+alert("Account Created Successfully");
+
+window.location.href="dashboard.html";
+
+}
+
+}catch(err){
+
+alert(err.message);
+
+}
+
+});
+
+</script>
 
     <script>
         function switchTab(mode) {
