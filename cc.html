@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Credit Store</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,sans-serif;
+}
+
+body{
+background:#050505;
+color:#fff;
+padding:20px;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.title{
+font-size:22px;
+font-weight:700;
+}
+
+.wallet{
+background:#111;
+padding:12px 18px;
+border-radius:12px;
+border:1px solid #222;
+}
+
+.wallet span{
+color:#e2dcc2;
+font-weight:600;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:18px;
+}
+
+.card{
+background:linear-gradient(135deg,#1a1a1a,#0f0f0f);
+border-radius:16px;
+padding:18px;
+border:1px solid #222;
+transition:0.3s;
+position:relative;
+}
+
+.card:hover{
+transform:translateY(-6px);
+border-color:#e2dcc2;
+}
+
+.bank{
+font-size:13px;
+color:#e2dcc2;
+margin-bottom:8px;
+}
+
+.number{
+letter-spacing:3px;
+font-size:15px;
+margin-bottom:10px;
+}
+
+.name{
+font-size:13px;
+color:#ccc;
+margin-bottom:6px;
+}
+
+.balance{
+font-size:13px;
+color:#9ca3af;
+margin-bottom:8px;
+}
+
+.price{
+font-size:12px;
+color:#e2dcc2;
+margin-bottom:10px;
+}
+
+.buy{
+width:100%;
+padding:9px;
+background:#e2dcc2;
+border:none;
+border-radius:10px;
+font-weight:600;
+cursor:pointer;
+}
+
+.popup{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+display:flex;
+align-items:center;
+justify-content:center;
+visibility:hidden;
+}
+
+.popup-box{
+background:#0f0f0f;
+padding:25px;
+border-radius:16px;
+width:300px;
+border:1px solid #222;
+text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+<div class="title">💳 Premium Card Store</div>
+
+<div class="wallet">
+Wallet : <span id="wallet">20</span> Credits
+</div>
+
+</div>
+
+<div class="cards" id="cardContainer"></div>
+
+<!-- PROCESSING POPUP -->
+
+<div class="popup" id="processing">
+
+<div class="popup-box">
+
+<h3>Processing Transaction...</h3>
+
+<p>Please wait while we prepare your card</p>
+
+<div style="margin-top:15px;font-size:22px">⏳</div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+
+import { 
+getFirestore,
+doc,
+getDoc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+/* FIREBASE CONFIG */
+
+const firebaseConfig = {
+apiKey: "AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
+authDomain: "zexi-bot.firebaseapp.com",
+projectId: "zexi-bot",
+storageBucket: "zexi-bot.firebasestorage.app",
+messagingSenderId: "245993811972",
+appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+/* USER */
+
+const userId = "user1";
+
+let wallet = 0;
+
+/* LOAD WALLET */
+
+async function loadWallet(){
+
+const docRef = doc(db,"users",userId);
+
+const docSnap = await getDoc(docRef);
+
+if(docSnap.exists()){
+
+wallet = docSnap.data().wallet;
+
+document.getElementById("wallet").innerText = wallet;
+
+}
+
+}
+
+loadWallet();
+
+/* CARD DATA */
+
+let cards = [
+
+{bank:"HDFC Bank",owner:"Rahul Sharma",balance:"₹24,000",price:7},
+{bank:"ICICI Bank",owner:"Aman Verma",balance:"₹18,500",price:5},
+{bank:"Axis Bank",owner:"Rohit Singh",balance:"₹31,200",price:16},
+{bank:"SBI Bank",owner:"Karan Mehta",balance:"₹15,900",price:5},
+{bank:"Kotak Bank",owner:"Aditya Jain",balance:"₹22,700",price:8},
+{bank:"IndusInd Bank",owner:"Vikas Gupta",balance:"₹28,400",price:14},
+{bank:"Yes Bank",owner:"Deepak Yadav",balance:"₹19,600",price:6},
+{bank:"HSBC Bank",owner:"Mohit Khanna",balance:"₹33,800",price:12},
+{bank:"Standard Chartered",owner:"Arjun Kapoor",balance:"₹26,300",price:9},
+{bank:"RBL Bank",owner:"Sahil Arora",balance:"₹17,200",price:7}
+
+];
+
+let container=document.getElementById("cardContainer");
+
+/* CREATE CARDS */
+
+cards.forEach((card,i)=>{
+
+let masked="**** **** **** "+(1000+i);
+
+container.innerHTML+=`
+
+<div class="card">
+
+<div class="bank">${card.bank}</div>
+
+<div class="number">${masked}</div>
+
+<div class="name">${card.owner}</div>
+
+<div class="balance">Balance : ${card.balance}</div>
+
+<div class="price">${card.price} Credits</div>
+
+<button class="buy" onclick="buyCard(${i})">Buy Card</button>
+
+</div>
+
+`;
+
+});
+
+/* BUY CARD */
+
+window.buyCard = async function(i){
+
+let cost = cards[i].price;
+
+if(wallet < cost){
+alert("Not enough credits");
+return;
+}
+
+/* CUT WALLET */
+
+wallet -= cost;
+
+document.getElementById("wallet").innerText = wallet;
+
+/* UPDATE FIREBASE */
+
+await updateDoc(doc(db,"users",userId),{
+wallet: wallet
+});
+
+/* GENERATE CARD DATA */
+
+let cardNumber = "4532 45"+(100+i)+" "+(200+i)+" "+(300+i);
+let expiry = "12/28";
+let cvv = 100 + i;
+
+/* SAVE DATA */
+
+localStorage.setItem("card_bank",cards[i].bank);
+localStorage.setItem("card_owner",cards[i].owner);
+localStorage.setItem("card_balance",cards[i].balance);
+localStorage.setItem("card_number",cardNumber);
+localStorage.setItem("card_expiry",expiry);
+localStorage.setItem("card_cvv",cvv);
+
+/* SHOW PROCESSING */
+
+document.getElementById("processing").style.visibility="visible";
+
+/* REDIRECT */
+
+setTimeout(()=>{
+
+window.location.href="card-result.html";
+
+},3000);
+
+}
+
+</script>
+
+</body>
+</html>

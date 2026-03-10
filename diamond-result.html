@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Diamond Processing</title>
+
+<style>
+
+body{
+background:#000;
+color:white;
+font-family:Arial;
+padding:20px;
+}
+
+h2{
+margin-bottom:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+border:1px solid #222;
+padding:12px;
+text-align:center;
+}
+
+th{
+background:#111;
+}
+
+.progress-box{
+width:100%;
+height:20px;
+background:#111;
+border-radius:20px;
+overflow:hidden;
+margin-top:20px;
+}
+
+.progress{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#ff0044,#7b00ff);
+}
+
+.status{
+margin-top:15px;
+font-weight:bold;
+color:#00ff88;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Diamond Delivery System</h2>
+
+<table>
+
+<tr>
+<th>UID</th>
+<th>Package</th>
+<th>Status</th>
+</tr>
+
+<tr>
+<td id="uid"></td>
+<td id="plan"></td>
+<td id="status">Processing...</td>
+</tr>
+
+</table>
+
+<div class="progress-box">
+<div class="progress" id="bar"></div>
+</div>
+
+<div class="status" id="message">
+Connecting to Garena Server...
+</div>
+
+<script>
+
+/* LOAD DATA */
+
+let uid = localStorage.getItem("diamond_uid")
+let plan = localStorage.getItem("diamond_plan")
+
+document.getElementById("uid").innerText = uid
+document.getElementById("plan").innerText = plan
+
+/* FAKE PROGRESS */
+
+let progress=0
+
+let steps=[
+"Connecting to Garena API...",
+"Checking UID...",
+"Injecting Diamonds...",
+"Verifying account...",
+"Finalizing delivery..."
+]
+
+let index=0
+
+let bar=document.getElementById("bar")
+
+let msg=document.getElementById("message")
+
+let interval=setInterval(()=>{
+
+progress+=10
+
+bar.style.width=progress+"%"
+
+msg.innerText=steps[Math.min(index,steps.length-1)]
+
+if(progress%20==0) index++
+
+if(progress>=100){
+
+clearInterval(interval)
+
+document.getElementById("status").innerText="Success"
+
+msg.innerText="🎉 Diamonds Successfully Sent!"
+
+}
+
+},500)
+
+</script>
+
+</body>
+</html>

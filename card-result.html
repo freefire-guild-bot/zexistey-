@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Card Result</title>
+
+<style>
+
+body{
+background:#050505;
+color:white;
+font-family:Arial;
+padding:30px;
+text-align:center;
+}
+
+.card{
+background:#111;
+border:1px solid #222;
+border-radius:16px;
+padding:25px;
+max-width:350px;
+margin:auto;
+}
+
+.number{
+font-size:18px;
+letter-spacing:3px;
+margin:15px 0;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+margin-top:10px;
+}
+
+.success{
+color:#00ff88;
+margin-bottom:15px;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="success">✔ Card Purchased Successfully</div>
+
+<h3 id="bank"></h3>
+
+<div class="number" id="number"></div>
+
+<div>Owner : <span id="owner"></span></div>
+
+<div class="row">
+<div>Expiry : <span id="expiry"></span></div>
+<div>CVV : <span id="cvv"></span></div>
+</div>
+
+<div style="margin-top:10px">
+Balance : <span id="balance"></span>
+</div>
+
+</div>
+
+<script>
+
+document.getElementById("bank").innerText =
+localStorage.getItem("card_bank");
+
+document.getElementById("owner").innerText =
+localStorage.getItem("card_owner");
+
+document.getElementById("balance").innerText =
+localStorage.getItem("card_balance");
+
+document.getElementById("number").innerText =
+localStorage.getItem("card_number");
+
+document.getElementById("expiry").innerText =
+localStorage.getItem("card_expiry");
+
+document.getElementById("cvv").innerText =
+localStorage.getItem("card_cvv");
+
+</script>
+
+</body>
+</html>
