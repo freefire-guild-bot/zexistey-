@@ -170,12 +170,8 @@ const user = userCredential.user;
 /* CREATE USER DOCUMENT */
 
 await setDoc(doc(db,"users",user.uid),{
-
 email:user.email,
-wallet:20,
-online:true,
-lastLogin:new Date()
-
+wallet:0
 });
 
 alert("Account Created Successfully");
