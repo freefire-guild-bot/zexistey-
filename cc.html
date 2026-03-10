@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium Credit Store</title>
-
-<style>
+<title>Premium Credit Store</title><style>
 
 *{
 margin:0;
@@ -126,38 +123,9 @@ border:1px solid #222;
 text-align:center;
 }
 
-</style>
-</head>
-
-<body>
-
-<div class="header">
-
-<div class="title">💳 Premium Card Store</div>
-
-<div class="wallet">
+</style></head><body><div class="header"><div class="title">💳 Premium Card Store</div><div class="wallet">
 Wallet: <span id="walletBalance">0 Credits</span>
-</div>
-
-</div>
-
-<div class="cards" id="cardContainer"></div>
-
-<div class="popup" id="processing">
-
-<div class="popup-box">
-
-<h3>Processing Transaction...</h3>
-
-<p>Please wait while we prepare your card</p>
-
-<div style="margin-top:15px;font-size:22px">⏳</div>
-
-</div>
-
-</div>
-
-<script type="module">
+</div></div><div class="cards" id="cardContainer"></div><div class="popup" id="processing"><div class="popup-box"><h3>Processing Transaction...</h3><p>Please wait while we prepare your card</p><div style="margin-top:15px;font-size:22px">⏳</div></div></div><script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 
@@ -166,7 +134,8 @@ getFirestore,
 doc,
 getDoc,
 setDoc,
-updateDoc
+updateDoc,
+onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 import {
@@ -186,9 +155,7 @@ appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
-
 const auth = getAuth(app);
 
 let wallet = 0;
@@ -199,25 +166,18 @@ let userId = null;
 onAuthStateChanged(auth, async(user)=>{
 
 if(!user){
-
 window.location.href="login.html";
 return;
-
 }
 
 userId = user.uid;
 
 const ref = doc(db,"users",userId);
-
 const snap = await getDoc(ref);
 
-if(snap.exists()){
+/* CREATE USER IF NOT EXIST */
 
-wallet = snap.data().wallet || 0;
-
-}else{
-
-wallet = 0;
+if(!snap.exists()){
 
 await setDoc(ref,{
 email:user.email,
@@ -226,7 +186,16 @@ wallet:0
 
 }
 
-document.getElementById("wallet").innerText = wallet;
+/* REALTIME WALLET LISTENER */
+
+onSnapshot(ref,(docSnap)=>{
+
+wallet = docSnap.data().wallet || 0;
+
+document.getElementById("walletBalance").innerText =
+wallet + " Credits";
+
+});
 
 });
 
@@ -248,6 +217,8 @@ let cards = [
 ];
 
 let container=document.getElementById("cardContainer");
+
+/* CREATE CARDS */
 
 cards.forEach((card,i)=>{
 
@@ -288,11 +259,13 @@ return;
 
 wallet -= cost;
 
-document.getElementById("wallet").innerText = wallet;
+/* UPDATE FIREBASE */
 
 await updateDoc(doc(db,"users",userId),{
 wallet: wallet
 });
+
+/* GENERATE CARD DATA */
 
 let cardNumber = "4532 45"+(100+i)+" "+(200+i)+" "+(300+i);
 let expiry = "12/28";
@@ -305,7 +278,11 @@ localStorage.setItem("card_number",cardNumber);
 localStorage.setItem("card_expiry",expiry);
 localStorage.setItem("card_cvv",cvv);
 
+/* SHOW PROCESSING */
+
 document.getElementById("processing").style.visibility="visible";
+
+/* REDIRECT */
 
 setTimeout(()=>{
 
@@ -315,7 +292,5 @@ window.location.href="card-result.html";
 
 }
 
-</script>
-
-</body>
+</script></body>
 </html>
