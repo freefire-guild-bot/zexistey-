@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FFGlory Interface</title>
+
+<style>
+
+/* --- Base Setup --- */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+body { background-color: #000; color: #fff; padding: 15px; min-height: 100vh; }
+
+/* --- Header Section --- */
+.header-container {
+display:flex;
+justify-content:space-between;
+align-items:center;
+width:100%;
+border-bottom:1px solid rgba(255,255,255,0.1);
+padding-bottom:15px;
+margin-bottom:20px;
+}
+
+.logo-section { display:flex; align-items:center; gap:10px; }
+
+.logo-box {
+background-color:#e2dcc2;
+width:38px;
+height:38px;
+border-radius:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.brand-name { font-size:20px; font-weight:800; }
+
+.actions { display:flex; align-items:center; gap:10px; }
+
+.notification-btn {
+position:relative;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.1);
+padding:9px;
+border-radius:12px;
+color:#a1a1aa;
+}
+
+.online-dot {
+position:absolute;
+top:0;
+right:0;
+width:8px;
+height:8px;
+background-color:#22c55e;
+border-radius:50%;
+border:1.5px solid #000;
+}
+
+.wallet-btn {
+background:rgba(226,220,194,0.1);
+border:1px solid rgba(226,220,194,0.2);
+color:#e2dcc2;
+padding:8px 14px;
+border-radius:12px;
+font-size:13px;
+font-weight:600;
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+.wallet-btn span { color:#fff; }
+
+/* ---------- DASHBOARD STYLE ---------- */
+
+.dashboard{margin-top:20px;}
+
+.card{
+background:#0b0b0b;
+border:1px solid #1a1a1a;
+border-radius:16px;
+padding:18px;
+margin-bottom:14px;
+}
+
+input,select{
+width:100%;
+padding:14px;
+border-radius:12px;
+border:1px solid #222;
+background:#050505;
+color:white;
+margin-bottom:10px;
+}
+
+.option-row{display:flex;gap:10px;}
+
+.option-btn{
+flex:1;
+padding:12px;
+border-radius:20px;
+border:1px solid #222;
+background:#111;
+text-align:center;
+cursor:pointer;
+}
+
+.option-btn.active{
+background:linear-gradient(45deg,#ff0055,#8a00ff);
+}
+
+.start-btn{
+margin-top:12px;
+width:100%;
+padding:16px;
+border-radius:30px;
+border:none;
+background:linear-gradient(90deg,#ff0055,#a000ff);
+color:white;
+font-weight:700;
+letter-spacing:1px;
+}
+
+.status{
+background:#0d0d0d;
+border:1px solid #222;
+padding:12px;
+border-radius:12px;
+text-align:center;
+color:#00ff88;
+margin-bottom:12px;
+}
+
+.log-box{
+height:120px;
+background:#050505;
+border:1px solid #222;
+border-radius:12px;
+padding:10px;
+font-family:monospace;
+font-size:12px;
+overflow:auto;
+color:#00ff66;
+}
+
+.bot-section{
+display:flex;
+gap:10px;
+margin-top:12px;
+}
+
+.bot-box{
+flex:1;
+background:#0b0b0b;
+border:1px solid #222;
+border-radius:12px;
+padding:14px;
+text-align:center;
+}
+
+.live{color:#00ff88;font-size:18px;}
+.busy{color:#ff4444;font-size:18px;}
+
+.tagline{
+margin-top:10px;
+background:#0b0b0b;
+border:1px solid #222;
+border-radius:12px;
+padding:10px;
+text-align:center;
+font-size:12px;
+color:#aaa;
+}
+
+/* --- Bottom Navigation --- */
+
+.bottom-nav {
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+height:75px;
+background-color:#050505;
+display:flex;
+justify-content:space-around;
+align-items:center;
+border-top:1px solid #1a1a1a;
+z-index:1000;
+}
+
+.nav-item {
+text-decoration:none;
+display:flex;
+flex-direction:column;
+align-items:center;
+color:#71717a;
+padding:10px;
+border-radius:14px;
+flex:1;
+transition:0.3s;
+}
+
+.nav-item.active { background-color:#18181b; color:#f4f4f5; }
+
+.nav-item span { font-size:11px; margin-top:4px; }
+
+.nav-item svg { width:22px; height:22px; }
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<div class="header-container">
+<div class="logo-section">
+<div class="logo-box">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M13 2 L3 14 L12 14 L11 22 L21 10 L12 10 Z"/></svg>
+</div>
+<h1 class="brand-name">ZEXI BOT</h1>
+</div>
+
+<div class="actions">
+<div class="notification-btn">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+<span class="online-dot"></span>
+</div>
+
+<div class="wallet-btn">
+Wallet: <span id="walletBalance">₹0</span>
+</div>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+
+<div class="dashboard">
+
+<div class="card">
+
+<input id="uidInput" placeholder="Enter Guild UID">
+
+<select>
+<option>Select Region</option>
+<option>India</option>
+<option>Brazil</option>
+<option>Pakistan</option>
+</select>
+
+<select>
+<option>Select Device</option>
+<option>Android</option>
+<option>iOS</option>
+</select>
+
+<!-- BOT SELECT -->
+<select id="botSelect">
+<option value="3">Guild Glory Bot — 3</option>
+<option value="4">Guild Glory Bot — 4 Credits</option>
+<option value="5">Guild Glory Bot — 5 Credits</option>
+<option value="6">Guild Glory Bot — 6 Credits</option>
+<option value="7">Guild Glory Bot — 7 Credits</option>
+<option value="8">Guild Glory Bot — 8 Credits</option>
+<option value="9">Guild Glory Bot — 9 Credits</option>
+<option value="10">Guild Glory Bot — 10 Credits</option>
+<option value="11">Guild Glory Bot — 11 Credits</option>
+<option value="12">Guild Glory Bot — 12 Credits</option>
+<option value="13">Guild Glory Bot — 13 Credits</option>
+<option value="14">Guild Glory Bot — 14 Credits</option>
+<option value="15">Guild Glory Bot — 15 Credits</option>
+</select>
+
+<div class="option-row">
+<div class="option-btn" onclick="toggleOption(this)">FF</div>
+<div class="option-btn" onclick="toggleOption(this)">MEX</div>
+</div>
+
+<button class="start-btn" onclick="startBot()">START</button>
+
+</div>
+
+<div class="status">SYSTEM STATUS: READY</div>
+
+<div class="log-box" id="terminal">
+> System ready...<br>
+</div>
+
+<div class="bot-section">
+<div class="bot-box">
+Live Bots
+<div class="live" id="liveBots">14</div>
+</div>
+
+<div class="bot-box">
+Busy Bots
+<div class="busy" id="busyBots">6</div>
+</div>
+</div>
+
+<div class="tagline">
+⚡ Secure Server • 🤖 Auto Bots • 🚀 Fast Processing
+</div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+
+<nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="payment.html" class="nav-item ">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+            <span>Transactions</span>
+        </a>
+        <a href="diamond.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>
+            <span>Discount</span>
+        </a>
+        <a href="history.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>History</span>
+        </a>
+        <a href="account.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Account</span>
+        </a>
+    </nav>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+
+import { 
+getFirestore,
+doc,
+getDoc,
+setDoc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
+authDomain: "zexi-bot.firebaseapp.com",
+projectId: "zexi-bot",
+storageBucket: "zexi-bot.firebasestorage.app",
+messagingSenderId: "245993811972",
+appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* USER ID */
+
+const userId = "user1";
+
+let wallet = 0;
+
+/* LOAD WALLET */
+
+async function loadWallet(){
+
+const ref = doc(db,"users",userId);
+
+const snap = await getDoc(ref);
+
+if(snap.exists()){
+
+wallet = snap.data().wallet || 0;
+
+}else{
+
+/* CREATE USER IF NOT EXIST */
+
+wallet = 0;
+
+await setDoc(ref,{
+wallet:0
+});
+
+}
+
+document.getElementById("walletBalance").innerText = "₹"+wallet;
+
+}
+
+loadWallet();
+
+/* START BOT */
+
+window.startBot = async function(){
+
+let uid = document.getElementById("uidInput").value;
+let botCost = Number(document.getElementById("botSelect").value);
+
+if(uid==""){
+alert("Enter Guild UID");
+return;
+}
+
+if(wallet < botCost){
+alert("Insufficient Credits");
+return;
+}
+
+/* DEDUCT WALLET */
+
+wallet -= botCost;
+
+document.getElementById("walletBalance").innerText="₹"+wallet;
+
+/* UPDATE FIREBASE */
+
+await updateDoc(doc(db,"users",userId),{
+wallet: wallet
+});
+
+document.getElementById("terminal").innerHTML += "> Bot started successfully...<br>";
+
+localStorage.setItem("guild_uid",uid);
+
+setTimeout(()=>{
+window.location.href="bot-result.html";
+},800);
+
+}
+
+/* OPTION TOGGLE */
+
+window.toggleOption = function(el){
+el.classList.toggle("active")
+}
+
+/* TERMINAL AUTO RUN */
+
+const logs=[
+"Connecting to server...",
+"Loading bot modules...",
+"Checking security...",
+"Syncing region data...",
+"Bot network active...",
+"Initializing bots..."
+];
+
+setInterval(()=>{
+
+let term=document.getElementById("terminal");
+
+term.innerHTML+="> "+logs[Math.floor(Math.random()*logs.length)]+"<br>";
+
+term.scrollTop=term.scrollHeight;
+
+},2000);
+
+/* LIVE BOTS AUTO CHANGE */
+
+setInterval(()=>{
+
+let live=Math.floor(Math.random()*20)+10;
+
+let busy=Math.floor(Math.random()*10)+1;
+
+document.getElementById("liveBots").innerText=live;
+
+document.getElementById("busyBots").innerText=busy;
+
+},3000);
+
+</script>
+
+</body>
+</html>
