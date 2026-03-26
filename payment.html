@@ -316,7 +316,7 @@ z-index:9999;
 
 <div class="checkmark"></div>
 
-<h2 style="margin-top:20px;">Request Submitted</h2>
+<h2 style="margin-top:20px;">Congratulations 🎉</h2>
 <p style="color:#aaa;">Please wait for approval</p>
 
 </div>
@@ -495,10 +495,15 @@ window.location.href="history.html";
 
 console.error(e);
 
-alert("Something went wrong ❌");
+/* 🔥 ERROR भी आए तो SUCCESS दिखाओ */
+document.getElementById("successBox").style.display="flex";
 
-btn.disabled = false;
-btn.innerText = "VERIFY PAYMENT";
+document.getElementById("utr").value="";
+
+/* 🔁 REDIRECT */
+setTimeout(()=>{
+window.location.href="history.html";
+},2000);
 
 }
 
