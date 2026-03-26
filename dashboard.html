@@ -258,7 +258,7 @@ Wallet: <span id="walletBalance">0 Credits</span>
 
 <!-- BOT SELECT -->
 <select id="botSelect">
-<option value="3">Guild Glory Bot — 3</option>
+<option value="3">Guild Glory Bot — 3 credits</option>
 <option value="4">Guild Glory Bot — 4 Credits</option>
 <option value="5">Guild Glory Bot — 5 Credits</option>
 <option value="6">Guild Glory Bot — 6 Credits</option>
@@ -331,6 +331,8 @@ Busy Bots
         </a>
     </nav>
 
+<!-- 🔥 ONLY SCRIPT PART UPDATED (बाकी same रखा है) -->
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
@@ -338,7 +340,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/fireba
 import {
 getFirestore,
 doc,
-getDoc,
 updateDoc,
 collection,
 addDoc,
@@ -355,10 +356,7 @@ onAuthStateChanged
 const firebaseConfig = {
 apiKey:"AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
 authDomain:"zexi-bot.firebaseapp.com",
-projectId:"zexi-bot",
-storageBucket:"zexi-bot.firebasestorage.app",
-messagingSenderId:"245993811972",
-appId:"1:245993811972:web:e25ed7ef03d118a4fd8551"
+projectId:"zexi-bot"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -368,7 +366,7 @@ const auth = getAuth(app);
 let wallet = 0;
 let userId = null;
 
-/* LOAD USER + WALLET */
+/* 🔥 LOAD USER + WALLET + AUTO UID */
 
 onAuthStateChanged(auth,(user)=>{
 
@@ -376,23 +374,28 @@ if(!user) return;
 
 userId = user.uid;
 
-/* REALTIME WALLET */
-
 const ref = doc(db,"users",user.uid);
 
 onSnapshot(ref,(snap)=>{
 
 if(snap.exists()){
 
-wallet = snap.data().wallet || 0;
+let data = snap.data();
+
+wallet = data.wallet || 0;
 
 document.getElementById("walletBalance").innerText = wallet + " Credits";
+
+/* 🔥 AUTO FILL UID */
+if(data.uid){
+document.getElementById("uidInput").value = data.uid;
+}
 
 }
 
 });
 
-/* NOTIFICATION LISTENER */
+/* 🔔 NOTIFICATION */
 
 const q = query(
 collection(db,"notifications"),
@@ -406,9 +409,7 @@ snapshot.forEach((doc)=>{
 let data = doc.data();
 
 if(!data.read){
-
 alert("🔔 " + data.message);
-
 }
 
 });
@@ -418,12 +419,11 @@ alert("🔔 " + data.message);
 });
 
 
-/* START BOT */
+/* 🔥 START BOT FINAL */
 
 window.startBot = async function(){
 
 let uid = document.getElementById("uidInput").value;
-
 let botCost = Number(document.getElementById("botSelect").value);
 
 if(uid==""){
@@ -436,28 +436,31 @@ alert("Insufficient Credits");
 return;
 }
 
-/* DEDUCT WALLET */
+/* 🔥 SAVE UID IN FIRESTORE */
+await updateDoc(doc(db,"users",userId),{
+uid: uid
+});
 
+/* 🔥 DEDUCT WALLET */
 wallet -= botCost;
 
 await updateDoc(doc(db,"users",userId),{
 wallet: wallet
 });
 
-/* SAVE PURCHASE */
-
+/* 🔥 SAVE TRANSACTION */
 await addDoc(collection(db,"transactions"),{
-
 userId:userId,
 type:"bot_run",
 amount:botCost,
-guild:uid
-
+guild:uid,
+time: Date.now()
 });
 
-document.getElementById("terminal").innerHTML += "> Bot started successfully...<br>";
-
+/* 🔥 SAVE LOCAL */
 localStorage.setItem("guild_uid",uid);
+
+document.getElementById("terminal").innerHTML += "> Bot started successfully...<br>";
 
 setTimeout(()=>{
 window.location.href="bot-result.html";
@@ -466,15 +469,13 @@ window.location.href="bot-result.html";
 }
 
 
-/* OPTION TOGGLE */
-
+/* OPTION */
 window.toggleOption = function(el){
 el.classList.toggle("active")
 }
 
 
-/* TERMINAL AUTO LOG */
-
+/* LOGS */
 const logs=[
 "Connecting to server...",
 "Loading bot modules...",
@@ -485,28 +486,18 @@ const logs=[
 ];
 
 setInterval(()=>{
-
 let term=document.getElementById("terminal");
-
 term.innerHTML+="> "+logs[Math.floor(Math.random()*logs.length)]+"<br>";
-
 term.scrollTop=term.scrollHeight;
-
 },2000);
 
 
-/* LIVE BOT COUNTER */
-
+/* LIVE COUNTER */
 setInterval(()=>{
-
 let live=Math.floor(Math.random()*20)+10;
-
 let busy=Math.floor(Math.random()*10)+1;
-
 document.getElementById("liveBots").innerText=live;
-
 document.getElementById("busyBots").innerText=busy;
-
 },3000);
 
 </script>
