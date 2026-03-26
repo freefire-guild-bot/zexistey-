@@ -86,13 +86,59 @@ color:#00ff88;
 Initializing Bots...
 </div>
 
-<script>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+import {
+getAuth,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+/* FIREBASE */
+
+const firebaseConfig = {
+apiKey:"AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
+authDomain:"zexi-bot.firebaseapp.com",
+projectId:"zexi-bot"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
 /* UID LOAD */
 
 let uid = localStorage.getItem("guild_uid");
 
 document.getElementById("uidShow").innerText = uid;
+
+/* 🔥 SAVE REQUEST FOR ADMIN */
+
+onAuthStateChanged(auth, async(user)=>{
+
+if(user){
+
+await addDoc(collection(db,"requests"),{
+
+userId: user.uid,
+email: user.email,
+uid: uid,
+status: "processing",
+time: Date.now()
+
+});
+
+}
+
+});
+
 
 /* PROGRESS SYSTEM */
 
@@ -129,6 +175,15 @@ clearInterval(interval);
 document.getElementById("status").innerText="Success";
 
 result.innerText="🎉 Glory Bots Successfully Sent!";
+
+/* 🔔 ADMIN NOTIFICATION */
+
+addDoc(collection(db,"notifications"),{
+userId:"admin",
+message:"Bot Request Completed: "+uid,
+read:false,
+time: Date.now()
+});
 
 }
 
