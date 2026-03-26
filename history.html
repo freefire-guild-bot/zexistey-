@@ -169,7 +169,7 @@ height:22px;
 </div>
 
 <div class="wallet-btn">
-Wallet: <span id="walletBalance">0 Credits</span>
+Wallet: <span id="walletBalance">₹0</span>
 </div>
 
 </div>
@@ -206,6 +206,8 @@ USER PAYMENT REQUESTS
         </a>
     </nav>
 
+<!-- 🔥 ONLY SCRIPT UPDATED (design same रखा है) -->
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
@@ -215,7 +217,7 @@ getFirestore,
 collection,
 query,
 where,
-getDocs,
+onSnapshot,
 doc,
 getDoc
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
@@ -228,66 +230,54 @@ onAuthStateChanged
 const firebaseConfig={
 apiKey:"AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
 authDomain:"zexi-bot.firebaseapp.com",
-projectId:"zexi-bot",
-storageBucket:"zexi-bot.firebasestorage.app",
-messagingSenderId:"245993811972",
-appId:"1:245993811972:web:e25ed7ef03d118a4fd8551"
+projectId:"zexi-bot"
 };
 
 const app=initializeApp(firebaseConfig);
-
 const db=getFirestore(app);
-
 const auth=getAuth(app);
 
-/* LOAD WALLET */
+/* 🔥 WALLET */
 
 async function loadWallet(uid){
 
-const ref = doc(db,"users",uid);
-
-const snap = await getDoc(ref);
+const ref=doc(db,"users",uid);
+const snap=await getDoc(ref);
 
 if(snap.exists()){
-
 document.getElementById("walletBalance").innerText =
-(snap.data().wallet || 0) + " Credits";
-
-}else{
-
-document.getElementById("walletBalance").innerText =
-"0 Credits";
-
+"₹"+(snap.data().wallet||0);
 }
 
 }
-/* LOAD HISTORY */
 
-async function loadHistory(userId){
+/* 🔥 LIVE HISTORY */
+
+function loadHistory(userId){
 
 const container=document.getElementById("requests");
-
-container.innerHTML="Loading...";
 
 const q=query(
 collection(db,"payments"),
 where("userId","==",userId)
 );
 
-const querySnapshot=await getDocs(q);
+onSnapshot(q,(snapshot)=>{
 
 container.innerHTML="";
 
-if(querySnapshot.empty){
-
+if(snapshot.empty){
 container.innerHTML="<p>No payment history</p>";
 return;
-
 }
 
-querySnapshot.forEach((docSnap)=>{
+snapshot.forEach((docSnap)=>{
 
 let data=docSnap.data();
+
+let time = data.time
+? new Date(data.time).toLocaleString()
+: "N/A";
 
 let div=document.createElement("div");
 
@@ -295,11 +285,15 @@ div.className="request-box";
 
 div.innerHTML=`
 
+<div class="req-row"><span>UID</span><span>${data.uid || "N/A"}</span></div>
+
 <div class="req-row"><span>Credits</span><span>${data.credits}</span></div>
 
 <div class="req-row"><span>Amount</span><span>₹${data.amount}</span></div>
 
 <div class="req-row"><span>UTR</span><span>${data.utr}</span></div>
+
+<div class="req-row"><span>Time</span><span>${time}</span></div>
 
 <div class="status">Status : ${data.status}</div>
 
@@ -309,22 +303,19 @@ container.appendChild(div);
 
 });
 
+});
+
 }
 
-/* LOGIN CHECK */
+/* LOGIN */
 
 onAuthStateChanged(auth,(user)=>{
 
 if(user){
-
 loadWallet(user.uid);
-
 loadHistory(user.uid);
-
 }else{
-
 document.getElementById("requests").innerHTML="Please login";
-
 }
 
 });
