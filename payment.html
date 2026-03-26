@@ -268,6 +268,8 @@ Wallet: <span id="walletBalance">0 Credits</span>
         </a>
     </nav>
 
+<!-- 🔥 ONLY SCRIPT UPDATED (बाकी design same रखा है) -->
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
@@ -290,10 +292,7 @@ onAuthStateChanged
 const firebaseConfig = {
 apiKey: "AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
 authDomain: "zexi-bot.firebaseapp.com",
-projectId: "zexi-bot",
-storageBucket: "zexi-bot.firebasestorage.app",
-messagingSenderId: "245993811972",
-appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
+projectId: "zexi-bot"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -301,13 +300,14 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 let currentUser = null;
+let userGuildUID = "";
 
-/* LOAD USER + WALLET */
+/* 🔥 LOAD USER + UID */
 
 onAuthStateChanged(auth, async(user)=>{
 
 if(!user){
-alert("Please login first");
+alert("Login required");
 window.location.href="login.html";
 return;
 }
@@ -317,11 +317,16 @@ currentUser = user;
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-let wallet = 0;
-
 if(snap.exists()){
 
-wallet = snap.data().wallet || 0;
+let data = snap.data();
+
+/* WALLET */
+document.getElementById("walletBalance").innerText =
+(data.wallet || 0) + " Credits";
+
+/* 🔥 GET UID */
+userGuildUID = data.uid || "";
 
 }else{
 
@@ -330,12 +335,10 @@ email:user.email,
 wallet:0
 });
 
-wallet = 0;
-
 }
 
-document.getElementById("walletBalance").innerText = wallet + " Credits";
 });
+
 
 /* CREDIT SYSTEM */
 
@@ -366,14 +369,15 @@ document.getElementById("qr").src =
 
 }
 
-/* VERIFY PAYMENT */
+
+/* 🔥 VERIFY PAYMENT FINAL */
 
 window.verifyPayment = async function(){
 
 let utr = document.getElementById("utr").value;
 
 if(utr.length < 12){
-alert("Enter valid 12 digit UTR");
+alert("Enter valid UTR");
 return;
 }
 
@@ -382,21 +386,37 @@ alert("Login required");
 return;
 }
 
-/* SAVE REQUEST */
+/* 🔥 SAVE PAYMENT WITH FULL DATA */
 
 await addDoc(collection(db,"payments"),{
 
-user: currentUser.email,
+email: currentUser.email,
 userId: currentUser.uid,
+
+/* 🔥 IMPORTANT */
+uid: userGuildUID,   // 👈 GUILD UID
+
 credits: credits,
 amount: credits * price,
 utr: utr,
+
 status: "pending",
+
+time: Date.now(),    // 👈 readable time
 date: serverTimestamp()
 
 });
 
-alert("Payment request submitted");
+/* 🔔 ADMIN NOTIFICATION */
+
+await addDoc(collection(db,"notifications"),{
+userId: "admin",
+message: "New Payment Request from " + currentUser.email,
+read: false,
+time: Date.now()
+});
+
+alert("Payment request submitted ✅");
 
 document.getElementById("utr").value="";
 
