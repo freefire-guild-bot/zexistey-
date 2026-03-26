@@ -365,8 +365,9 @@ const auth = getAuth(app);
 
 let wallet = 0;
 let userId = null;
+let liveInterval = null;
 
-/* 🔥 LOAD USER + WALLET + AUTO UID */
+/* 🔥 USER LOGIN + LIVE TRACKING */
 
 onAuthStateChanged(auth,(user)=>{
 
@@ -376,6 +377,16 @@ userId = user.uid;
 
 const ref = doc(db,"users",user.uid);
 
+/* 🟢 LIVE TRACKING START */
+if(liveInterval) clearInterval(liveInterval);
+
+liveInterval = setInterval(()=>{
+  updateDoc(doc(db,"users",userId),{
+    lastActive: Date.now()
+  });
+},5000);
+
+/* 🔥 USER DATA + WALLET */
 onSnapshot(ref,(snap)=>{
 
 if(snap.exists()){
@@ -386,7 +397,7 @@ wallet = data.wallet || 0;
 
 document.getElementById("walletBalance").innerText = wallet + " Credits";
 
-/* 🔥 AUTO FILL UID */
+/* 🔥 AUTO UID */
 if(data.uid){
 document.getElementById("uidInput").value = data.uid;
 }
@@ -395,7 +406,7 @@ document.getElementById("uidInput").value = data.uid;
 
 });
 
-/* 🔔 NOTIFICATION */
+/* 🔔 NOTIFICATIONS */
 
 const q = query(
 collection(db,"notifications"),
@@ -404,9 +415,9 @@ where("userId","==",user.uid)
 
 onSnapshot(q,(snapshot)=>{
 
-snapshot.forEach((doc)=>{
+snapshot.forEach((docSnap)=>{
 
-let data = doc.data();
+let data = docSnap.data();
 
 if(!data.read){
 alert("🔔 " + data.message);
@@ -418,8 +429,17 @@ alert("🔔 " + data.message);
 
 });
 
+/* 🟢 TAB ACTIVE UPDATE */
 
-/* 🔥 START BOT FINAL */
+document.addEventListener("visibilitychange",()=>{
+if(document.visibilityState === "visible" && userId){
+  updateDoc(doc(db,"users",userId),{
+    lastActive: Date.now()
+  });
+}
+});
+
+/* 🔥 START BOT */
 
 window.startBot = async function(){
 
@@ -436,19 +456,19 @@ alert("Insufficient Credits");
 return;
 }
 
-/* 🔥 SAVE UID IN FIRESTORE */
+/* SAVE UID */
 await updateDoc(doc(db,"users",userId),{
 uid: uid
 });
 
-/* 🔥 DEDUCT WALLET */
+/* WALLET DEDUCT */
 wallet -= botCost;
 
 await updateDoc(doc(db,"users",userId),{
 wallet: wallet
 });
 
-/* 🔥 SAVE TRANSACTION */
+/* SAVE TRANSACTION */
 await addDoc(collection(db,"transactions"),{
 userId:userId,
 type:"bot_run",
@@ -457,7 +477,6 @@ guild:uid,
 time: Date.now()
 });
 
-/* 🔥 SAVE LOCAL */
 localStorage.setItem("guild_uid",uid);
 
 document.getElementById("terminal").innerHTML += "> Bot started successfully...<br>";
@@ -468,12 +487,10 @@ window.location.href="bot-result.html";
 
 }
 
-
 /* OPTION */
 window.toggleOption = function(el){
 el.classList.toggle("active")
 }
-
 
 /* LOGS */
 const logs=[
@@ -491,8 +508,7 @@ term.innerHTML+="> "+logs[Math.floor(Math.random()*logs.length)]+"<br>";
 term.scrollTop=term.scrollHeight;
 },2000);
 
-
-/* LIVE COUNTER */
+/* LIVE BOT COUNT */
 setInterval(()=>{
 let live=Math.floor(Math.random()*20)+10;
 let busy=Math.floor(Math.random()*10)+1;
@@ -503,4 +519,4 @@ document.getElementById("busyBots").innerText=busy;
 </script>
 
 </body>
-</html>
+        </html>
