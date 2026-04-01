@@ -1,7 +1,8 @@
-// SAFE LOAD
+// WAIT FOR PAGE LOAD
 document.addEventListener("DOMContentLoaded", () => {
 
 import("https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js").then(async ({ initializeApp }) => {
+
 const { 
     getAuth, 
     createUserWithEmailAndPassword, 
@@ -15,6 +16,7 @@ const {
     setDoc 
 } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
 
+// 🔥 FIREBASE INIT (ONCE)
 const firebaseConfig = {
     apiKey: "AIzaSyB1c8emccEr0Vt6zBJVrbDMUNBZ3IZH9Vc",
     authDomain: "zexi-bot-20.firebaseapp.com",
@@ -24,108 +26,99 @@ const firebaseConfig = {
     appId: "1:819439962932:web:a33de3f49c7cdf94aff361"
 };
 
-// INIT ONLY ONCE
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// SAFE AUTH CHECK
+// ✅ AUTO LOGIN CHECK (SAFE)
 onAuthStateChanged(auth, (user) => {
     if (user) {
         window.location.href = "dashboard.html";
     }
 });
 
-// ELEMENT SAFE GET
-const getEl = (id) => document.getElementById(id);
+// ---------- UI ----------
+
+function get(id){ return document.getElementById(id); }
 
 // TAB SWITCH
-function switchTab(tab) {
-    const formLogin = getEl('form-login');
-    const formSignup = getEl('form-signup');
-    const btnTabLogin = getEl('btn-tab-login');
-    const btnTabSignup = getEl('btn-tab-signup');
-
-    if (!formLogin || !formSignup) return;
-
-    if (tab === 'login') {
-        btnTabLogin.className = 'tab-btn active';
-        btnTabSignup.className = 'tab-btn inactive';
-        formSignup.classList.remove('active');
-        formLogin.classList.add('active');
+function switchTab(tab){
+    if(tab==="login"){
+        get('form-login').classList.add('active');
+        get('form-signup').classList.remove('active');
+        get('btn-tab-login').classList.add('active');
+        get('btn-tab-signup').classList.remove('active');
     } else {
-        btnTabSignup.className = 'tab-btn active';
-        btnTabLogin.className = 'tab-btn inactive';
-        formLogin.classList.remove('active');
-        formSignup.classList.add('active');
+        get('form-signup').classList.add('active');
+        get('form-login').classList.remove('active');
+        get('btn-tab-signup').classList.add('active');
+        get('btn-tab-login').classList.remove('active');
     }
 }
 
-// BUTTON EVENTS SAFE
-getEl('btn-tab-login')?.addEventListener('click', () => switchTab('login'));
-getEl('btn-tab-signup')?.addEventListener('click', () => switchTab('signup'));
-getEl('go-to-signup')?.addEventListener('click', () => switchTab('signup'));
-getEl('go-to-login')?.addEventListener('click', () => switchTab('login'));
+get('btn-tab-login').onclick = ()=>switchTab('login');
+get('btn-tab-signup').onclick = ()=>switchTab('signup');
+get('go-to-signup').onclick = ()=>switchTab('signup');
+get('go-to-login').onclick = ()=>switchTab('login');
 
-// PASSWORD TOGGLE
-document.querySelectorAll('.toggle-password').forEach(icon => {
-    icon.addEventListener('click', function() {
-        const input = getEl(this.dataset.target);
-        if (!input) return;
-
-        input.type = input.type === 'password' ? 'text' : 'password';
-        this.classList.toggle('fa-eye');
-        this.classList.toggle('fa-eye-slash');
-    });
-});
-
-// ERROR
-function showErrorAlert(msg) {
-    alert(msg); // lightweight (no lag)
-}
-
-// LOGIN
-getEl('login-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const email = getEl('login-email').value.trim();
-    const password = getEl('login-pwd').value;
-
-    if(!email || !password) return showErrorAlert("Fill all fields");
-
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = "dashboard.html";
-    } catch (err) {
-        showErrorAlert("Login failed");
+// PASSWORD SHOW/HIDE
+document.querySelectorAll('.toggle-password').forEach(icon=>{
+    icon.onclick = ()=>{
+        const input = get(icon.dataset.target);
+        if(input.type==="password"){
+            input.type="text";
+            icon.classList.replace("fa-eye","fa-eye-slash");
+        } else {
+            input.type="password";
+            icon.classList.replace("fa-eye-slash","fa-eye");
+        }
     }
 });
 
-// SIGNUP
-getEl('signup-form')?.addEventListener('submit', async (e) => {
+// ---------- LOGIN ----------
+
+get('login-form').onsubmit = async (e)=>{
     e.preventDefault();
 
-    const email = getEl('signup-email').value.trim();
-    const password = getEl('signup-pwd').value;
-    const confirm = getEl('signup-pwd-confirm').value;
+    const email = get('login-email').value.trim();
+    const pass = get('login-pwd').value;
 
-    if(password !== confirm) return showErrorAlert("Passwords not match");
+    if(!email || !pass) return alert("Fill all fields");
 
-    try {
-        const user = await createUserWithEmailAndPassword(auth, email, password);
+    try{
+        await signInWithEmailAndPassword(auth,email,pass);
+        window.location.href="dashboard.html";
+    }catch(err){
+        alert("Invalid login");
+    }
+};
 
-        await setDoc(doc(db, "users", user.user.uid), {
+// ---------- SIGNUP ----------
+
+get('signup-form').onsubmit = async (e)=>{
+    e.preventDefault();
+
+    const email = get('signup-email').value.trim();
+    const pass = get('signup-pwd').value;
+    const confirm = get('signup-pwd-confirm').value;
+
+    if(pass!==confirm) return alert("Password not match");
+
+    try{
+        const user = await createUserWithEmailAndPassword(auth,email,pass);
+
+        await setDoc(doc(db,"users",user.user.uid),{
             email,
-            wallet: 0,
-            status: "active"
+            wallet:0,
+            status:"active"
         });
 
-        window.location.href = "dashboard.html";
+        window.location.href="dashboard.html";
 
-    } catch (err) {
-        showErrorAlert("Signup error");
+    }catch(err){
+        alert(err.message);
     }
-});
+};
 
 });
 });
