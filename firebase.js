@@ -3,12 +3,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/fireba
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCvMVx_geWeeiNgw0ziSR80mvncHlOwKQY",
-  authDomain: "zexi-bot.firebaseapp.com",
-  projectId: "zexi-bot",
-  storageBucket: "zexi-bot.firebasestorage.app",
-  messagingSenderId: "245993811972",
-  appId: "1:245993811972:web:e25ed7ef03d118a4fd8551"
+  apiKey: "AIzaSyB1c8emccEr0Vt6zBJVrbDMUNBZ3IZH9Vc",
+  authDomain: "zexi-bot-20.firebaseapp.com",
+  projectId: "zexi-bot-20",
+  storageBucket: "zexi-bot-20.firebasestorage.app",
+  messagingSenderId: "819439962932",
+  appId: "1:819439962932:web:a33de3f49c7cdf94aff361"
 };
 
 const app = initializeApp(firebaseConfig);
