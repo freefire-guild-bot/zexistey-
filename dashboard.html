@@ -476,7 +476,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, collection, updateDoc, onSnapshot, query, where, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, setDoc, collection, onSnapshot, query, where, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
 const firebaseConfig = {
@@ -500,7 +500,7 @@ let selectedPlanPrice = 350;
 let isUidValid = false;
 let isUtrValid = false;
 
-// Listeners Unsubscribe Functions
+// Listeners Unsubscribe Functions mapped to prevent memory leaks
 let unsubAdmin = null;
 let unsubUser = null;
 let unsubTx = null;
@@ -545,11 +545,11 @@ function playSuccessSound() {
 }
 
 function cleanupListeners() {
-    if (unsubAdmin) unsubAdmin();
-    if (unsubUser) unsubUser();
-    if (unsubTx) unsubTx();
-    if (unsubChat) unsubChat();
-    if (unsubOrders) unsubOrders();
+    if (unsubAdmin) { unsubAdmin(); unsubAdmin = null; }
+    if (unsubUser) { unsubUser(); unsubUser = null; }
+    if (unsubTx) { unsubTx(); unsubTx = null; }
+    if (unsubChat) { unsubChat(); unsubChat = null; }
+    if (unsubOrders) { unsubOrders(); unsubOrders = null; }
 }
 
 // Auth Listener
@@ -562,7 +562,7 @@ onAuthStateChanged(auth, (user) => {
         initApp();
     } else {
         cleanupListeners();
-        window.location.href = "index.html";
+        window.location.href = "index.html"; // Ensure auth logic reflects true path
     }
 });
 
@@ -582,7 +582,7 @@ if (el('logoutBtn')) {
 function initApp() {
     cleanupListeners();
 
-    // Admin Support Status
+    // Admin Support Status Check
     try {
         const statusEl = el('supportStatus');
         const dotEl = el('supportDot');
@@ -622,6 +622,7 @@ function initApp() {
                 const data = docSnap.data();
                 if (data.status === 'banned') {
                     document.body.innerHTML = `<h1 style="color:var(--error-color); text-align:center; font-family:'Orbitron'; margin-top:50px;">YOUR ACCOUNT IS BANNED</h1>`;
+                    cleanupListeners();
                     return;
                 }
                 walletBalance = data.wallet || 0;
@@ -916,7 +917,7 @@ countryCards.forEach(card => {
     });
 });
 
-// Submit UTR Transaction
+// SUBMIT UTR TRANSACTION LOGIC FIX
 if (submitPaymentBtn) {
     submitPaymentBtn.addEventListener('click', async () => {
         if (!isUtrValid) return;
@@ -926,8 +927,16 @@ if (submitPaymentBtn) {
         submitPaymentBtn.innerText = "SUBMITTING...";
 
         try {
+            // Check Duplicate UTR Entry
+            const txQ = query(collection(db, "transactions"), where("utr", "==", utr));
+            const txSnap = await getDocs(txQ);
+            
+            if(!txSnap.empty) {
+                throw new Error("Duplicate UTR Entry found!");
+            }
+
             await addDoc(collection(db, "transactions"), {
-                uid: guildUidInput ? guildUidInput.value : 'N/A', 
+                uid: guildUidInput && guildUidInput.value ? guildUidInput.value : 'N/A', 
                 plan: selectedPlanPrice, 
                 utr: utr, 
                 email: userEmail, 
@@ -951,16 +960,16 @@ if (submitPaymentBtn) {
             if(txNav) txNav.click();
         } catch (err) {
             console.error("Transaction Submission Error:", err);
-            showToast("Failed to submit payment. Try again.");
-            submitPaymentBtn.disabled = false;
+            showToast(err.message === "Duplicate UTR Entry found!" ? "Error: UTR already submitted." : "Failed to submit payment. Try again.");
             submitPaymentBtn.classList.add('enabled');
         } finally {
+            submitPaymentBtn.disabled = false;
             submitPaymentBtn.innerText = "SUBMIT PAYMENT";
         }
     });
 }
 
-// Modal (Wallet Purchase)
+// Modal (Wallet Purchase) - STRICT DUPLICATE & BALANCE FIX
 const modalOverlay = el('paymentModal');
 const modalStepConfirm = el('modalStepConfirm');
 const modalStepProcess = el('modalStepProcess');
@@ -996,6 +1005,7 @@ if (el('btnProceed')) {
     el('btnProceed').addEventListener('click', async () => {
         if (modalStepConfirm) modalStepConfirm.style.display = 'none'; 
         if (modalStepProcess) modalStepProcess.style.display = 'flex';
+        
         if (modalSpinner) {
             modalSpinner.style.display = 'block'; 
             modalSpinner.style.borderTopColor = 'var(--neon-glow)';
@@ -1006,16 +1016,41 @@ if (el('btnProceed')) {
         }
         
         try {
-            const newBalance = walletBalance - selectedPlanPrice;
-            await updateDoc(doc(db, "users", userEmail), { wallet: newBalance });
+            const uid = guildUidInput ? guildUidInput.value : 'N/A';
+            const userRef = doc(db, "users", userEmail);
+            
+            // 1. Strict Server-Side check of actual balance (Prevent local manipulation)
+            const userSnap = await getDoc(userRef);
+            const realWalletBalance = userSnap.exists() ? (userSnap.data().wallet || 0) : 0;
+            
+            if (realWalletBalance < selectedPlanPrice) {
+                throw new Error("Insufficient Balance in Database");
+            }
+            
+            // 2. Strict Duplicate Order check
+            const orderQ = query(collection(db, "orders"), where("uid", "==", uid));
+            const orderSnap = await getDocs(orderQ);
+            
+            if (!orderSnap.empty) {
+                throw new Error("Order for this UID already exists");
+            }
 
-            await addDoc(collection(db, "orders"), {
-                uid: guildUidInput ? guildUidInput.value : 'N/A', 
+            // 3. Process Wallet & Order Atomically using WriteBatch
+            const batch = writeBatch(db);
+            const newBalance = realWalletBalance - selectedPlanPrice;
+            
+            batch.update(userRef, { wallet: newBalance });
+
+            const newOrderRef = doc(collection(db, "orders"));
+            batch.set(newOrderRef, {
+                uid: uid, 
                 plan: selectedPlanPrice, 
                 email: userEmail, 
                 status: "Active", 
                 time: new Date().toISOString()
             });
+            
+            await batch.commit();
 
             if (walletBox) {
                 walletBox.classList.remove('wallet-pulse');
@@ -1060,7 +1095,14 @@ if (el('btnProceed')) {
         } catch(error) {
             console.error("Wallet Purchase Error:", error);
             if (modalOverlay) modalOverlay.classList.remove('active');
-            showToast("Transaction failed. Try again.");
+            
+            if (error.message.includes("exists")) {
+                showToast("Order for this UID already exists! ❌");
+            } else if (error.message.includes("Balance")) {
+                showToast("Server Error: Insufficient Wallet Balance ❌");
+            } else {
+                showToast("Transaction failed. Try again.");
+            }
         }
     });
 }
@@ -1075,8 +1117,6 @@ window.addEventListener("resize", () => {
         document.body.classList.remove("keyboard-open"); 
     }
 });
-
 </script>
-
 </body>
 </html>
