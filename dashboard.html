@@ -475,7 +475,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, getDocs, setDoc, collection, onSnapshot, query, where, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
@@ -483,7 +483,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyB1c8emccEr0Vt6zBJVrbDMUNBZ3IZH9Vc",
   authDomain: "zexi-bot-20.firebaseapp.com",
   projectId: "zexi-bot-20",
-  storageBucket: "zexi-bot-20.firebasestorage.app",
+  storageBucket: "zexi-bot-20.appspot.com",
   messagingSenderId: "819439962932",
   appId: "1:819439962932:web:a33de3f49c7cdf94aff361"
 };
@@ -493,21 +493,24 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// State Variables
 let userEmail = "";
+let authUid = ""; 
 let walletBalance = 0;
 let selectedPlanPrice = 350;
 let isUidValid = false;
 let isUtrValid = false;
 
-// Listeners Unsubscribe Functions mapped to prevent memory leaks
+let isUserInitialLoad = true;
+let isTxInitialLoad = true;
+let isOrderInitialLoad = true;
+let isChatInitialLoad = true;
+
 let unsubAdmin = null;
 let unsubUser = null;
 let unsubTx = null;
 let unsubChat = null;
 let unsubOrders = null;
 
-// DOM Elements
 const el = (id) => document.getElementById(id);
 const mainApp = el('mainApp');
 const authOverlay = el('authOverlay');
@@ -517,31 +520,57 @@ const userEmailDisplay = el('userEmailDisplay');
 const toastEl = el('toast');
 const toastMsg = el('toast-msg');
 
-// Utility Functions
+// ==========================================
+// SOUND SYSTEM
+// ==========================================
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTone(freq, type, duration, vol = 0.1) {
+    if (!audioCtx) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+const sounds = {
+    click: () => playTone(600, 'sine', 0.1, 0.05),
+    success: () => { playTone(880, 'sine', 0.1, 0.1); setTimeout(() => playTone(1100, 'sine', 0.15, 0.1), 100); },
+    error: () => { playTone(300, 'square', 0.2, 0.1); setTimeout(() => playTone(250, 'square', 0.2, 0.1), 150); },
+    notification: () => playTone(750, 'triangle', 0.15, 0.05)
+};
+
+document.addEventListener('click', (e) => {
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    const t = e.target;
+    if (t.tagName === 'BUTTON' || t.closest('.nav-item') || t.closest('.plan-card') || t.closest('.country-card') || t.closest('#qrWrapper') || t.closest('.chat-msg img')) {
+        sounds.click();
+    }
+});
+
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
 function showToast(msg, isSuccess = false) {
     if (!toastEl || !toastMsg) return;
     toastMsg.innerText = msg;
     toastEl.style.borderColor = isSuccess ? "var(--success-color)" : "var(--error-color)";
     toastEl.style.boxShadow = isSuccess ? "0 5px 15px rgba(0,255,0,0.4)" : "0 5px 15px rgba(255,0,51,0.4)";
     toastEl.classList.add('show');
+    if (isSuccess) sounds.success(); else sounds.error();
     setTimeout(() => toastEl.classList.remove('show'), 3000);
-}
-
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playSuccessSound() {
-    if(audioCtx.state === 'suspended') audioCtx.resume();
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); 
-    oscillator.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); 
-    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.05);
-    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.3);
 }
 
 function cleanupListeners() {
@@ -552,25 +581,54 @@ function cleanupListeners() {
     if (unsubOrders) { unsubOrders(); unsubOrders = null; }
 }
 
-// Auth Listener
+// ==========================================
+// AUTHENTICATION
+// ==========================================
 onAuthStateChanged(auth, (user) => {
     if (user) {
         userEmail = user.email;
+        authUid = user.uid; 
         if (authOverlay) authOverlay.style.display = 'none';
         if (mainApp) mainApp.style.display = 'flex';
         if (userEmailDisplay) userEmailDisplay.innerText = userEmail;
         initApp();
     } else {
         cleanupListeners();
-        window.location.href = "index.html"; // Ensure auth logic reflects true path
+        if (authOverlay) authOverlay.style.display = 'flex';
+        if (mainApp) mainApp.style.display = 'none';
     }
 });
+
+if(el('loginBtn')) {
+    el('loginBtn').addEventListener('click', async () => {
+        const email = el('loginEmail').value.trim();
+        if(!email) return showToast("Enter a valid email");
+        
+        el('loginBtn').disabled = true;
+        el('loginBtn').innerText = "CONNECTING...";
+        
+        const pwd = "zexi_user_secure_123";
+        try {
+            await signInWithEmailAndPassword(auth, email, pwd);
+            sounds.success();
+        } catch(e) {
+            try {
+                await createUserWithEmailAndPassword(auth, email, pwd);
+                sounds.success();
+            } catch(err) {
+                showToast("Login Failed");
+                el('loginBtn').disabled = false;
+                el('loginBtn').innerText = "ACCESS TOOL";
+            }
+        }
+    });
+}
 
 if (el('logoutBtn')) {
     el('logoutBtn').addEventListener('click', async () => {
         try {
             await signOut(auth);
-            window.location.href = "index.html";
+            window.location.reload();
         } catch (err) {
             console.error("Logout Error:", err);
             showToast("Logout failed");
@@ -578,46 +636,36 @@ if (el('logoutBtn')) {
     });
 }
 
-// Init App Data
+// ==========================================
+// INITIALIZE APP (SINGLE USER ID SYSTEM)
+// ==========================================
 function initApp() {
     cleanupListeners();
+    isUserInitialLoad = true;
+    isTxInitialLoad = true;
+    isOrderInitialLoad = true;
+    isChatInitialLoad = true;
 
-    // Admin Support Status Check
-    try {
-        const statusEl = el('supportStatus');
-        const dotEl = el('supportDot');
-
-        if (statusEl && dotEl) {
-            statusEl.innerText = 'CHECKING...';
-            dotEl.className = 'status-dot status-offline';
-
-            unsubAdmin = onSnapshot(doc(db, "admin_status", "status"), (docSnap) => {
-                let isOnline = false;
-                if (docSnap.exists()) {
-                    isOnline = docSnap.data()?.online === true;
-                }
-                if (isOnline) {
-                    statusEl.innerText = 'LIVE';
-                    statusEl.style.color = 'var(--success-color)';
-                    dotEl.className = 'status-dot status-live';
-                } else {
-                    statusEl.innerText = 'OFFLINE';
-                    statusEl.style.color = 'var(--error-color)';
-                    dotEl.className = 'status-dot status-offline';
-                }
-            }, (err) => {
-                console.error("Admin Status Snapshot Error:", err);
-                statusEl.innerText = 'ERROR';
-                statusEl.style.color = 'var(--error-color)';
-                dotEl.className = 'status-dot status-offline';
+    // Admin Status
+    const statusEl = el('supportStatus');
+    const dotEl = el('supportDot');
+    if (statusEl && dotEl) {
+        statusEl.innerText = 'CHECKING...';
+        dotEl.className = 'status-dot status-offline';
+        unsubAdmin = onSnapshot(doc(db, "admin_status", "status"), (docSnap) => {
+            requestAnimationFrame(() => {
+                let isOnline = docSnap.exists() && docSnap.data()?.online === true;
+                statusEl.innerText = isOnline ? 'LIVE' : 'OFFLINE';
+                statusEl.style.color = isOnline ? 'var(--success-color)' : 'var(--error-color)';
+                dotEl.className = isOnline ? 'status-dot status-live' : 'status-dot status-offline';
             });
-        }
-    } catch (e) { console.error("Admin Status Init Error:", e); }
+        });
+    }
 
-    // Users Collection Listener
-    try {
-        const userRef = doc(db, "users", userEmail);
-        unsubUser = onSnapshot(userRef, (docSnap) => {
+    // User Wallet & Status (Strict UID matching)
+    const userRef = doc(db, "users", authUid);
+    unsubUser = onSnapshot(userRef, (docSnap) => {
+        requestAnimationFrame(() => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 if (data.status === 'banned') {
@@ -625,69 +673,104 @@ function initApp() {
                     cleanupListeners();
                     return;
                 }
+                
+                if (!isUserInitialLoad && walletBalance < (data.wallet || 0)) {
+                    sounds.success();
+                    showToast("Wallet Credited! ✅", true);
+                    if (walletBox) {
+                        walletBox.classList.remove('wallet-pulse');
+                        void walletBox.offsetWidth;
+                        walletBox.classList.add('wallet-pulse');
+                    }
+                }
+                
                 walletBalance = data.wallet || 0;
                 if (walletAmountEl) walletAmountEl.innerText = `₹${walletBalance}`;
+                isUserInitialLoad = false;
             } else {
-                setDoc(userRef, { email: userEmail, wallet: 0, status: "active" }).catch(e => console.error("Create User Error:", e));
+                setDoc(userRef, { email: userEmail, uid: authUid, wallet: 0, status: "active" }).catch(console.error);
             }
-        }, (err) => console.error("User Snapshot Error:", err));
-    } catch(e) { console.error(e); }
+        });
+    });
 
-    // Transactions Listener
-    try {
-        const txQuery = query(collection(db, "transactions"), where("email", "==", userEmail));
-        unsubTx = onSnapshot(txQuery, (snap) => {
-            let txs = [];
-            snap.forEach(d => txs.push({id: d.id, ...d.data()}));
-            txs.sort((a, b) => new Date(b.time) - new Date(a.time));
-            renderTransactions(txs);
-        }, (err) => console.error("TX Snapshot Error:", err));
-    } catch(e) { console.error(e); }
+    // Transactions (Strict UID matching)
+    const txQuery = query(collection(db, "transactions"), where("uid", "==", authUid));
+    unsubTx = onSnapshot(txQuery, (snap) => {
+        if (!isTxInitialLoad) {
+            snap.docChanges().forEach(change => {
+                if (change.type === "modified" && change.doc.data().status === 'Verified') {
+                    showToast("Transaction Verified! ✅", true);
+                    sounds.success();
+                } else if (change.type === "modified" && change.doc.data().status === 'Rejected') {
+                    showToast("Transaction Rejected ❌");
+                    sounds.error();
+                }
+            });
+        }
+        isTxInitialLoad = false;
 
-    // Chats Listener
-    try {
-        const chatQuery = query(collection(db, "chats"), where("email", "==", userEmail));
-        unsubChat = onSnapshot(chatQuery, (snap) => {
-            let msgs = [];
-            snap.forEach(d => msgs.push(d.data()));
-            msgs.sort((a, b) => new Date(a.time) - new Date(b.time));
-            renderChat(msgs);
-        }, (err) => console.error("Chat Snapshot Error:", err));
-    } catch(e) { console.error(e); }
+        let txs = [];
+        snap.forEach(d => txs.push({id: d.id, ...d.data()}));
+        txs.sort((a, b) => new Date(b.time) - new Date(a.time));
+        requestAnimationFrame(() => renderTransactions(txs));
+    });
 
-    // Orders Listener
-    try {
-        const ordersQuery = query(collection(db, "orders"), where("email", "==", userEmail));
-        unsubOrders = onSnapshot(ordersQuery, (snap) => {
-            let ords = [];
-            snap.forEach(d => ords.push(d.data()));
-            ords.sort((a, b) => new Date(b.time) - new Date(a.time));
-            renderOrders(ords);
-        }, (err) => console.error("Orders Snapshot Error:", err));
-    } catch(e) { console.error(e); }
+    // Chat (Strict UID matching)
+    const chatQuery = query(collection(db, "chats"), where("uid", "==", authUid));
+    unsubChat = onSnapshot(chatQuery, (snap) => {
+        if (!isChatInitialLoad) {
+            snap.docChanges().forEach(change => {
+                if (change.type === "added" && change.doc.data().sender === 'ZEXI') {
+                    sounds.notification();
+                }
+            });
+        }
+        isChatInitialLoad = false;
+
+        let msgs = [];
+        snap.forEach(d => msgs.push(d.data()));
+        msgs.sort((a, b) => new Date(a.time) - new Date(b.time));
+        requestAnimationFrame(() => renderChat(msgs));
+    });
+
+    // Orders (Strict UID matching)
+    const ordersQuery = query(collection(db, "orders"), where("uid", "==", authUid));
+    unsubOrders = onSnapshot(ordersQuery, (snap) => {
+        if (!isOrderInitialLoad) {
+            snap.docChanges().forEach(change => {
+                if (change.type === "added") {
+                    showToast("New Order Created! 🚀", true);
+                    sounds.success();
+                }
+            });
+        }
+        isOrderInitialLoad = false;
+
+        let ords = [];
+        snap.forEach(d => ords.push(d.data()));
+        ords.sort((a, b) => new Date(b.time) - new Date(a.time));
+        requestAnimationFrame(() => renderOrders(ords));
+    });
 
     updateQR();
 }
 
-// Render Functions
 function renderTransactions(txList) {
     const list = el('transactionList');
     if (!list) return;
     if (txList.length === 0) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No recent transactions.</p>'; return; }
     
-    let html = '';
-    txList.forEach(tx => {
+    list.innerHTML = txList.map(tx => {
         const isVerified = tx.status === 'Verified';
         const isRejected = tx.status === 'Rejected';
         const statusClass = isVerified ? 'verified' : (isRejected ? 'rejected' : 'pending');
         const date = new Date(tx.time).toLocaleString('en-IN', { hour12: true, month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
-        html += `<div class="tx-card">
+        return `<div class="tx-card">
             <div class="tx-row"><span class="tx-email">${tx.email}</span><span class="tx-status ${statusClass}">${tx.status}</span></div>
-            <div class="tx-row tx-details"><span>Plan: <span class="tx-highlight">₹${tx.plan}</span></span><span>UID: ${tx.uid}</span></div>
+            <div class="tx-row tx-details"><span>Plan: <span class="tx-highlight">₹${tx.plan}</span></span><span>Game UID: ${tx.gameUid || 'N/A'}</span></div>
             <div class="tx-row tx-details" style="margin-bottom: 0;"><span>UTR: <span style="color:#fff;">${tx.utr}</span></span><span style="font-size:0.75rem;">${date}</span></div>
         </div>`;
-    });
-    list.innerHTML = html;
+    }).join('');
 }
 
 function renderOrders(ords) {
@@ -695,44 +778,41 @@ function renderOrders(ords) {
     if (!list) return;
     if (ords.length === 0) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No orders found.</p>'; return; }
     
-    let html = '';
-    ords.forEach(o => {
+    list.innerHTML = ords.map(o => {
         const date = new Date(o.time).toLocaleDateString('en-IN');
-        html += `<div class="tx-card">
-            <div class="tx-row"><span class="tx-email">UID: ${o.uid}</span><span class="tx-status ${o.status==='Active'?'verified':'rejected'}">${o.status}</span></div>
+        return `<div class="tx-card">
+            <div class="tx-row"><span class="tx-email">Game UID: ${o.gameUid || 'N/A'}</span><span class="tx-status ${o.status==='Active'?'verified':'rejected'}">${o.status}</span></div>
             <div class="tx-row tx-details"><span>Plan: ₹${o.plan}</span><span>${date}</span></div>
         </div>`;
-    });
-    list.innerHTML = html;
+    }).join('');
 }
 
 function renderChat(messages) {
     const chatBox = el('chatBox');
     if (!chatBox) return;
     
-    chatBox.innerHTML = '';
     if (messages.length === 0) {
         chatBox.innerHTML = `<p style="text-align:center; color: var(--text-muted); margin-top: 50px; font-size: 0.9rem;">Start chatting with ZEXI Support</p>`;
         return;
     }
     
-    messages.forEach(msg => {
-        const div = document.createElement('div');
-        div.className = `chat-msg ${msg.sender === 'USER' ? 'user' : 'zexi'}`;
+    const isScrolledToBottom = chatBox.scrollHeight - chatBox.clientHeight <= chatBox.scrollTop + 50;
+
+    chatBox.innerHTML = messages.map(msg => {
         let content = `<div class="sender">${msg.sender} • ${new Date(msg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>`;
         if (msg.text) content += `<div>${msg.text}</div>`;
         if (msg.img) content += `<img src="${msg.img}" alt="Attachment" loading="lazy">`;
-        div.innerHTML = content;
-        chatBox.appendChild(div);
-    });
+        return `<div class="chat-msg ${msg.sender === 'USER' ? 'user' : 'zexi'}">${content}</div>`;
+    }).join('');
     
-    // Smooth scroll to bottom
-    setTimeout(() => {
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }, 100);
+    if (isScrolledToBottom) {
+        requestAnimationFrame(() => { chatBox.scrollTop = chatBox.scrollHeight; });
+    }
 }
 
-// Chat Actions
+// ==========================================
+// CHAT INTERACTIONS
+// ==========================================
 const chatInput = el('chatInput');
 const chatSendBtn = el('chatSendBtn');
 const chatFile = el('chatFile');
@@ -748,7 +828,7 @@ function updateSendBtnState() {
 }
 
 if (chatInput) {
-    chatInput.addEventListener('input', updateSendBtnState);
+    chatInput.addEventListener('input', debounce(updateSendBtnState, 150));
     chatInput.addEventListener('keypress', (e) => { 
         if(e.key === 'Enter' && !chatSendBtn.disabled) chatSendBtn.click(); 
     });
@@ -773,24 +853,22 @@ if (chatSendBtn) {
     chatSendBtn.addEventListener('click', async () => {
         const text = chatInput ? chatInput.value.trim() : "";
         const file = chatFile && chatFile.files.length > 0 ? chatFile.files[0] : null;
-        
         if (!text && !file) return;
 
         chatSendBtn.disabled = true;
         chatSendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        
         if (chatInput) chatInput.disabled = true;
 
         let downloadUrl = null;
-
         try {
             if (file) {
-                const storageRef = ref(storage, `chat_images/${userEmail}_${Date.now()}_${file.name}`);
+                const storageRef = ref(storage, `chat_images/${authUid}_${Date.now()}_${file.name}`);
                 const uploadTask = await uploadBytesResumable(storageRef, file);
                 downloadUrl = await getDownloadURL(uploadTask.ref);
             }
 
             await addDoc(collection(db, "chats"), { 
+                uid: authUid,
                 email: userEmail, 
                 sender: 'USER', 
                 text: text, 
@@ -801,68 +879,75 @@ if (chatSendBtn) {
             if (chatFile) chatFile.value = ''; 
             if (chatInput) chatInput.value = ''; 
             if (chatPreviewContainer) chatPreviewContainer.style.display = 'none'; 
+            sounds.click();
             
         } catch (err) {
             console.error("Chat Send Error:", err);
-            showToast("Failed to send message. Try again.");
+            showToast("Failed to send message.");
         } finally {
             if (chatInput) chatInput.disabled = false;
             chatSendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
             updateSendBtnState();
-            
             if (chatInput) chatInput.focus();
+            const chatBox = el('chatBox');
+            if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
         }
     });
 }
 
-// Navigation
+// ==========================================
+// UI & NAVIGATION
+// ==========================================
 const navItems = document.querySelectorAll('.nav-item');
 const pageSections = document.querySelectorAll('.page-section');
 navItems.forEach(item => {
     item.addEventListener('click', () => {
-        navItems.forEach(nav => nav.classList.remove('active'));
-        pageSections.forEach(sec => sec.classList.remove('active'));
-        item.classList.add('active');
-        
-        const targetId = item.getAttribute('data-target');
-        const targetSec = el(targetId);
-        if (targetSec) targetSec.classList.add('active');
-        
-        const chatBox = el('chatBox');
-        if (targetId === 'section-help' && chatBox) { 
-            chatBox.scrollTop = chatBox.scrollHeight; 
-        }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        requestAnimationFrame(() => {
+            navItems.forEach(nav => nav.classList.remove('active'));
+            pageSections.forEach(sec => sec.classList.remove('active'));
+            item.classList.add('active');
+            
+            const targetId = item.getAttribute('data-target');
+            const targetSec = el(targetId);
+            if (targetSec) targetSec.classList.add('active');
+            
+            const chatBox = el('chatBox');
+            if (targetId === 'section-help' && chatBox) { 
+                chatBox.scrollTop = chatBox.scrollHeight; 
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     });
 });
 
-// Form logic & Validation
+// ==========================================
+// VALIDATION & WORKFLOW
+// ==========================================
 const guildUidInput = el('guildUid');
 const uidError = el('uidError');
 const continueBtn = el('continueBtn');
 
-function validateForm() {
+const validateForm = () => {
     if (!guildUidInput) return;
     const val = guildUidInput.value.replace(/\D/g, '');
     guildUidInput.value = val;
-    isUidValid = val.length >= 10;
+    isUidValid = val.length >= 8;
     
     if (uidError) uidError.style.display = isUidValid || val.length === 0 ? 'none' : 'block';
-    
     if (continueBtn) {
         continueBtn.disabled = !isUidValid;
         isUidValid ? continueBtn.classList.add('enabled') : continueBtn.classList.remove('enabled');
     }
-}
+};
 
-if (guildUidInput) guildUidInput.addEventListener('input', validateForm);
+if (guildUidInput) guildUidInput.addEventListener('input', debounce(validateForm, 200));
 
 const utrInput = el('utrInput');
 const utrErrorMsg = el('utrErrorMsg');
 const submitPaymentBtn = el('submitPaymentBtn');
 
 if (utrInput) {
-    utrInput.addEventListener('input', (e) => {
+    utrInput.addEventListener('input', debounce((e) => {
         let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); 
         e.target.value = val;
         isUtrValid = val.length >= 12;
@@ -872,10 +957,9 @@ if (utrInput) {
             submitPaymentBtn.disabled = !isUtrValid;
             isUtrValid ? submitPaymentBtn.classList.add('enabled') : submitPaymentBtn.classList.remove('enabled');
         }
-    });
+    }, 200));
 }
 
-// Payment Selection and QR
 const paymentPlanSelect = el('paymentPlanSelect');
 const qrImage = el('qrImage');
 const qrAmount = el('qrAmount');
@@ -888,9 +972,7 @@ function updateQR() {
     if (qrImage) qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
     if (qrAmount) qrAmount.innerText = `₹${selectedPlanPrice}`;
     if (paymentPlanSelect) paymentPlanSelect.value = selectedPlanPrice.toString();
-    if (qrWrapper) {
-        qrWrapper.onclick = function() { window.location.href = upiLink; };
-    }
+    if (qrWrapper) qrWrapper.onclick = () => window.location.href = upiLink;
 }
 
 planCards.forEach(card => {
@@ -917,7 +999,9 @@ countryCards.forEach(card => {
     });
 });
 
-// SUBMIT UTR TRANSACTION LOGIC FIX
+// ==========================================
+// PAYMENT SUBMISSION (PREVENT DUPLICATES)
+// ==========================================
 if (submitPaymentBtn) {
     submitPaymentBtn.addEventListener('click', async () => {
         if (!isUtrValid) return;
@@ -927,16 +1011,17 @@ if (submitPaymentBtn) {
         submitPaymentBtn.innerText = "SUBMITTING...";
 
         try {
-            // FIXED: Check Duplicate UTR Entry with email filter
-            const txQ = query(collection(db, "transactions"), where("utr", "==", utr), where("email", "==", userEmail));
+            // Check Duplicate UTR
+            const txQ = query(collection(db, "transactions"), where("utr", "==", utr));
             const txSnap = await getDocs(txQ);
             
-            if(!txSnap.empty) {
-                throw new Error("Duplicate UTR Entry found!");
-            }
+            if(!txSnap.empty) throw new Error("Duplicate UTR Entry found!");
+
+            const enteredGameUid = guildUidInput && guildUidInput.value ? guildUidInput.value : 'N/A';
 
             await addDoc(collection(db, "transactions"), {
-                uid: guildUidInput && guildUidInput.value ? guildUidInput.value : 'N/A', 
+                uid: authUid,
+                gameUid: enteredGameUid, 
                 plan: selectedPlanPrice, 
                 utr: utr, 
                 email: userEmail, 
@@ -945,9 +1030,10 @@ if (submitPaymentBtn) {
             });
             
             await addDoc(collection(db, "chats"), { 
+                uid: authUid,
                 email: userEmail, 
                 sender: 'USER', 
-                text: `💸 Payment submitted: ₹${selectedPlanPrice}\n🧾 UTR: ${utr}\n\nPlease wait for verification.`, 
+                text: `💸 Payment submitted: ₹${selectedPlanPrice}\n🧾 UTR: ${utr}\n🎮 Guild UID: ${enteredGameUid}\n\nPlease wait for verification.`, 
                 img: null, 
                 time: new Date().toISOString() 
             });
@@ -960,7 +1046,7 @@ if (submitPaymentBtn) {
             if(txNav) txNav.click();
         } catch (err) {
             console.error("Transaction Submission Error:", err);
-            showToast(err.message === "Duplicate UTR Entry found!" ? "Error: UTR already submitted." : "Failed to submit payment. Try again.");
+            showToast(err.message.includes("Duplicate") ? "Error: UTR already submitted." : "Failed to submit payment.");
             submitPaymentBtn.classList.add('enabled');
         } finally {
             submitPaymentBtn.disabled = false;
@@ -969,7 +1055,9 @@ if (submitPaymentBtn) {
     });
 }
 
-// Modal (Wallet Purchase) - STRICT DUPLICATE & BALANCE FIX
+// ==========================================
+// WALLET PURCHASE / ORDER CREATION
+// ==========================================
 const modalOverlay = el('paymentModal');
 const modalStepConfirm = el('modalStepConfirm');
 const modalStepProcess = el('modalStepProcess');
@@ -1016,34 +1104,29 @@ if (el('btnProceed')) {
         }
         
         try {
-            const uid = guildUidInput ? guildUidInput.value : 'N/A';
-            const userRef = doc(db, "users", userEmail);
+            const gameUidVal = guildUidInput ? guildUidInput.value : 'N/A';
+            const userDocRef = doc(db, "users", authUid); 
             
-            // 1. Strict Server-Side check of actual balance (Prevent local manipulation)
-            const userSnap = await getDoc(userRef);
+            const userSnap = await getDoc(userDocRef);
             const realWalletBalance = userSnap.exists() ? (userSnap.data().wallet || 0) : 0;
             
             if (realWalletBalance < selectedPlanPrice) {
                 throw new Error("Insufficient Balance in Database");
             }
             
-            // 2. Strict Duplicate Order check
-            const orderQ = query(collection(db, "orders"), where("uid", "==", uid));
+            // Duplicate order check per UID
+            const orderQ = query(collection(db, "orders"), where("gameUid", "==", gameUidVal));
             const orderSnap = await getDocs(orderQ);
-            
-            if (!orderSnap.empty) {
-                throw new Error("Order for this UID already exists");
-            }
+            if (!orderSnap.empty) throw new Error("Order for this UID already exists");
 
-            // 3. Process Wallet & Order Atomically using WriteBatch
             const batch = writeBatch(db);
             const newBalance = realWalletBalance - selectedPlanPrice;
-            
-            batch.update(userRef, { wallet: newBalance });
+            batch.update(userDocRef, { wallet: newBalance });
 
             const newOrderRef = doc(collection(db, "orders"));
             batch.set(newOrderRef, {
-                uid: uid, 
+                uid: authUid,
+                gameUid: gameUidVal, 
                 plan: selectedPlanPrice, 
                 email: userEmail, 
                 status: "Active", 
@@ -1052,19 +1135,13 @@ if (el('btnProceed')) {
             
             await batch.commit();
 
-            if (walletBox) {
-                walletBox.classList.remove('wallet-pulse');
-                void walletBox.offsetWidth; 
-                walletBox.classList.add('wallet-pulse');
-            }
-
             setTimeout(() => {
                 if (modalStatusMsg) {
                     modalStatusMsg.className = 'status-msg text-success';
                     modalStatusMsg.innerText = "Payment Successful ✅";
                 }
                 if (modalSpinner) modalSpinner.style.borderTopColor = 'var(--success-color)';
-                playSuccessSound();
+                sounds.success();
 
                 setTimeout(() => {
                     if (modalStatusMsg) {
@@ -1079,13 +1156,15 @@ if (el('btnProceed')) {
                             modalStatusMsg.className = 'status-msg text-success';
                             modalStatusMsg.innerHTML = "Bot Activated 🚀";
                         }
-                        playSuccessSound();
+                        sounds.success();
                         
                         setTimeout(() => {
                             if (modalOverlay) modalOverlay.classList.remove('active');
                             setTimeout(() => {
                                 if (guildUidInput) guildUidInput.value = '';
                                 validateForm();
+                                const ordersNav = document.querySelector('.nav-item[data-target="section-history"]');
+                                if(ordersNav) ordersNav.click();
                             }, 500); 
                         }, 2500);
 
@@ -1097,26 +1176,26 @@ if (el('btnProceed')) {
             if (modalOverlay) modalOverlay.classList.remove('active');
             
             if (error.message.includes("exists")) {
-                showToast("Order for this UID already exists! ❌");
+                showToast("Order for this Guild UID already exists! ❌");
             } else if (error.message.includes("Balance")) {
                 showToast("Server Error: Insufficient Wallet Balance ❌");
             } else {
                 showToast("Transaction failed. Try again.");
             }
+            sounds.error();
         }
     });
 }
 
-// Keyboard Height Fix
 let initialHeight = window.innerHeight;
-window.addEventListener("resize", () => {
+window.addEventListener("resize", debounce(() => {
     let currentHeight = window.innerHeight;
     if (currentHeight < initialHeight - 120) {
         document.body.classList.add("keyboard-open"); 
     } else {
         document.body.classList.remove("keyboard-open"); 
     }
-});
+}, 150));
 </script>
 </body>
 </html>
