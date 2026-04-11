@@ -776,13 +776,29 @@ function renderTransactions(txList) {
 function renderOrders(ords) {
     const list = el('ordersList');
     if (!list) return;
-    if (ords.length === 0) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No orders found.</p>'; return; }
-    
+
+    if (ords.length === 0) {
+        list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No orders found.</p>';
+        return;
+    }
+
     list.innerHTML = ords.map(o => {
         const date = new Date(o.time).toLocaleDateString('en-IN');
-        return `<div class="tx-card">
-            <div class="tx-row"><span class="tx-email">Game UID: ${o.gameUid || 'N/A'}</span><span class="tx-status ${o.status==='Active'?'verified':'rejected'}">${o.status}</span></div>
-            <div class="tx-row tx-details"><span>Plan: ₹${o.plan}</span><span>${date}</span></div>
+
+        return `
+        <div class="tx-card">
+            <div class="tx-row">
+                <span class="tx-email">UID: ${o.uid || 'NO UID'}</span> <span class="tx-status ${o.status==='Active'?'verified':'rejected'}">${o.status}</span>
+            </div>
+
+            <div class="tx-row tx-details">
+                <span>Game UID: ${o.gameUid || 'N/A'}</span>
+                <span>₹${o.plan}</span>
+            </div>
+
+            <div class="tx-row tx-details">
+                <span>${date}</span>
+            </div>
         </div>`;
     }).join('');
 }
@@ -851,6 +867,14 @@ if (removeImgBtn) {
 
 if (chatSendBtn) {
     chatSendBtn.addEventListener('click', async () => {
+        if (!auth.currentUser || !auth.currentUser.uid) {
+            alert("Login required");
+            return;
+        }
+        
+        const uid = auth.currentUser.uid;
+        const email = auth.currentUser.email;
+
         const text = chatInput ? chatInput.value.trim() : "";
         const file = chatFile && chatFile.files.length > 0 ? chatFile.files[0] : null;
         if (!text && !file) return;
@@ -862,14 +886,14 @@ if (chatSendBtn) {
         let downloadUrl = null;
         try {
             if (file) {
-                const storageRef = ref(storage, `chat_images/${authUid}_${Date.now()}_${file.name}`);
+                const storageRef = ref(storage, `chat_images/${uid}_${Date.now()}_${file.name}`);
                 const uploadTask = await uploadBytesResumable(storageRef, file);
                 downloadUrl = await getDownloadURL(uploadTask.ref);
             }
 
             await addDoc(collection(db, "chats"), { 
-                uid: authUid,
-                email: userEmail, 
+                uid: uid,
+                email: email, 
                 sender: 'USER', 
                 text: text, 
                 img: downloadUrl, 
@@ -1004,6 +1028,13 @@ countryCards.forEach(card => {
 // ==========================================
 if (submitPaymentBtn) {
     submitPaymentBtn.addEventListener('click', async () => {
+        if (!auth.currentUser || !auth.currentUser.uid) {
+            alert("Login required");
+            return;
+        }
+        const uid = auth.currentUser.uid;
+        const email = auth.currentUser.email;
+
         if (!isUtrValid) return;
         const utr = utrInput.value;
         
@@ -1020,18 +1051,18 @@ if (submitPaymentBtn) {
             const enteredGameUid = guildUidInput && guildUidInput.value ? guildUidInput.value : 'N/A';
 
             await addDoc(collection(db, "transactions"), {
-                uid: authUid,
+                uid: uid,
                 gameUid: enteredGameUid, 
                 plan: selectedPlanPrice, 
                 utr: utr, 
-                email: userEmail, 
+                email: email, 
                 status: "Pending", 
                 time: new Date().toISOString()
             });
             
             await addDoc(collection(db, "chats"), { 
-                uid: authUid,
-                email: userEmail, 
+                uid: uid,
+                email: email, 
                 sender: 'USER', 
                 text: `💸 Payment submitted: ₹${selectedPlanPrice}\n🧾 UTR: ${utr}\n🎮 Guild UID: ${enteredGameUid}\n\nPlease wait for verification.`, 
                 img: null, 
@@ -1067,6 +1098,11 @@ const modalStatusMsg = el('modalStatusMsg');
 
 if (continueBtn) {
     continueBtn.addEventListener('click', () => {
+        if (!auth.currentUser || !auth.currentUser.uid) {
+            alert("Login required");
+            return;
+        }
+
         if (!isUidValid) return;
         if (walletBalance < selectedPlanPrice) { 
             showToast("Insufficient Balance ❌ Go to Pay/Acc."); 
@@ -1091,6 +1127,15 @@ if (el('btnCancel')) {
 
 if (el('btnProceed')) {
     el('btnProceed').addEventListener('click', async () => {
+        if (!auth.currentUser || !auth.currentUser.uid) {
+            alert("Login required");
+            if (modalOverlay) modalOverlay.classList.remove('active');
+            return;
+        }
+
+        const uid = auth.currentUser.uid;
+        const email = auth.currentUser.email;
+
         if (modalStepConfirm) modalStepConfirm.style.display = 'none'; 
         if (modalStepProcess) modalStepProcess.style.display = 'flex';
         
@@ -1104,8 +1149,8 @@ if (el('btnProceed')) {
         }
         
         try {
-            const gameUidVal = guildUidInput ? guildUidInput.value : 'N/A';
-            const userDocRef = doc(db, "users", authUid); 
+            const enteredGameUid = guildUidInput ? guildUidInput.value : 'N/A';
+            const userDocRef = doc(db, "users", uid); 
             
             const userSnap = await getDoc(userDocRef);
             const realWalletBalance = userSnap.exists() ? (userSnap.data().wallet || 0) : 0;
@@ -1115,7 +1160,7 @@ if (el('btnProceed')) {
             }
             
             // Duplicate order check per UID
-            const orderQ = query(collection(db, "orders"), where("gameUid", "==", gameUidVal));
+            const orderQ = query(collection(db, "orders"), where("gameUid", "==", enteredGameUid));
             const orderSnap = await getDocs(orderQ);
             if (!orderSnap.empty) throw new Error("Order for this UID already exists");
 
@@ -1125,10 +1170,10 @@ if (el('btnProceed')) {
 
             const newOrderRef = doc(collection(db, "orders"));
             batch.set(newOrderRef, {
-                uid: authUid,
-                gameUid: gameUidVal, 
+                uid: uid,
+                email: email,
+                gameUid: enteredGameUid, 
                 plan: selectedPlanPrice, 
-                email: userEmail, 
                 status: "Active", 
                 time: new Date().toISOString()
             });
