@@ -1,4 +1,3 @@
-// script.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { 
     getAuth, 
@@ -12,6 +11,7 @@ import {
     setDoc 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+// Your Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyB1c8emccEr0Vt6zBJVrbDMUNBZ3IZH9Vc",
     authDomain: "zexi-bot-20.firebaseapp.com",
@@ -21,16 +21,19 @@ const firebaseConfig = {
     appId: "1:819439962932:web:a33de3f49c7cdf94aff361"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// 🔐 SESSION MANAGEMENT: Redirect if already logged in
 onAuthStateChanged(auth, (user) => {
     if (user) {
         window.location.href = "dashboard.html";
     }
 });
 
+// --- UI Elements & Event Listeners ---
 const formLogin = document.getElementById('form-login');
 const formSignup = document.getElementById('form-signup');
 const btnTabLogin = document.getElementById('btn-tab-login');
@@ -38,6 +41,7 @@ const btnTabSignup = document.getElementById('btn-tab-signup');
 const goToSignupBtn = document.getElementById('go-to-signup');
 const goToLoginBtn = document.getElementById('go-to-login');
 
+// Tab Switching Logic
 function switchTab(tab) {
     if (tab === 'login') {
         btnTabLogin.className = 'tab-btn active';
@@ -57,6 +61,7 @@ btnTabSignup.addEventListener('click', () => switchTab('signup'));
 goToSignupBtn.addEventListener('click', () => switchTab('signup'));
 goToLoginBtn.addEventListener('click', () => switchTab('login'));
 
+// Password Visibility Toggle
 const toggleIcons = document.querySelectorAll('.toggle-password');
 toggleIcons.forEach(icon => {
     icon.addEventListener('click', function() {
@@ -73,20 +78,31 @@ toggleIcons.forEach(icon => {
     });
 });
 
+// ⚠️ ERROR HANDLING: Dynamic Toast Notification
 function showErrorAlert(message) {
+    // Creating the toast dynamically ensures it works even if missing from style.css
     const toast = document.createElement('div');
-    toast.className = 'ui-alert-toast';
     toast.innerText = message;
+    toast.style.cssText = `
+        position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+        background: #ff0033; color: white; padding: 12px 24px;
+        border-radius: 8px; font-weight: 600; font-family: 'Poppins', sans-serif;
+        z-index: 9999; transition: top 0.4s ease; box-shadow: 0 4px 12px rgba(255,0,51,0.4);
+        text-align: center; min-width: 250px;
+    `;
     document.body.appendChild(toast);
     
-    setTimeout(() => toast.classList.add('show'), 10);
+    // Slide in
+    setTimeout(() => toast.style.top = '20px', 10);
     
+    // Slide out and remove
     setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
+        toast.style.top = '-100px';
+        setTimeout(() => toast.remove(), 400);
     }, 3500);
 }
 
+// Button UX State Manager
 function setButtonState(btnId, state, originalText, originalIcon) {
     const btn = document.getElementById(btnId);
     
@@ -111,10 +127,12 @@ function setButtonState(btnId, state, originalText, originalIcon) {
     }
 }
 
+// --- 🔐 LOGIN LOGIC ---
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const email = document.getElementById('login-email').value.trim();
+    // Normalize email to lowercase
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
     const password = document.getElementById('login-pwd').value;
     const btnId = 'submit-login';
 
@@ -125,24 +143,32 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     try {
         await signInWithEmailAndPassword(auth, email, password);
         setButtonState(btnId, 'success');
+        
+        // onAuthStateChanged will handle the redirect automatically, but we add a fallback
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 1000);
     } catch (error) {
         setButtonState(btnId, 'reset', 'LOGIN', 'fa-solid fa-right-to-bracket');
         const errorCode = error.code;
+        
+        // Friendly error messages
         if(errorCode === 'auth/invalid-credential' || errorCode === 'auth/user-not-found' || errorCode === 'auth/wrong-password') {
             showErrorAlert("Invalid email or password.");
+        } else if (errorCode === 'auth/too-many-requests') {
+            showErrorAlert("Too many failed attempts. Try again later.");
         } else {
-            showErrorAlert(error.message);
+            showErrorAlert(error.message.replace("Firebase: ", ""));
         }
     }
 });
 
+// --- 🟢 SIGNUP LOGIC (WITH FIRESTORE FIX) ---
 document.getElementById('signup-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const email = document.getElementById('signup-email').value.trim();
+    // Normalize email to lowercase to match case-sensitive Firestore Rules
+    const email = document.getElementById('signup-email').value.trim().toLowerCase();
     const password = document.getElementById('signup-pwd').value;
     const confirmPassword = document.getElementById('signup-pwd-confirm').value;
     const btnId = 'submit-signup';
@@ -154,16 +180,22 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     setButtonState(btnId, 'loading');
 
     try {
+        // 1. Create Auth User
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        await setDoc(doc(db, "users", user.uid), {
+        // 2. 🔥 CRITICAL FIX: Use user.email as the Document ID to match Firestore rule: match /users/{email}
+        await setDoc(doc(db, "users", user.email), {
             email: user.email,
             wallet: 0,
-            status: "active"
+            status: "active",
+            uid: user.uid,
+            createdAt: new Date().toISOString()
         });
 
         setButtonState(btnId, 'success');
+        
+        // Redirect to dashboard
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 1000);
@@ -171,12 +203,14 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     } catch (error) {
         setButtonState(btnId, 'reset', 'SIGN UP', 'fa-solid fa-user-plus');
         const errorCode = error.code;
+        
+        // Friendly error messages
         if(errorCode === 'auth/email-already-in-use') {
             showErrorAlert("An account with this email already exists.");
         } else if(errorCode === 'auth/invalid-email') {
             showErrorAlert("Please enter a valid email address.");
         } else {
-            showErrorAlert(error.message);
+            showErrorAlert(error.message.replace("Firebase: ", ""));
         }
     }
 });
