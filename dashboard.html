@@ -927,8 +927,8 @@ if (submitPaymentBtn) {
         submitPaymentBtn.innerText = "SUBMITTING...";
 
         try {
-            // Check Duplicate UTR Entry
-            const txQ = query(collection(db, "transactions"), where("utr", "==", utr));
+            // FIXED: Check Duplicate UTR Entry with email filter
+            const txQ = query(collection(db, "transactions"), where("utr", "==", utr), where("email", "==", userEmail));
             const txSnap = await getDocs(txQ);
             
             if(!txSnap.empty) {
