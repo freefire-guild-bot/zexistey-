@@ -4,28 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ZEXI Tool Dashboard - PRO</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
     :root {
-        --bg-color: #030303;
-        --main-card-bg: rgba(18, 18, 18, 0.7);
-        --card-border: rgba(255, 69, 0, 0.3);
-        --neon-glow: #ff4500;
-        --neon-glow-dim: rgba(255, 69, 0, 0.2);
-        --text-main: #ffffff;
-        --text-muted: #a0a0a0;
-        --text-neon: #ff6600;
-        --success-color: #00ff00;
-        --error-color: #ff0033;
-        --transition-speed: 0.4s;
+        --bg-color: #000000;
+        --main-card-bg: #09090b;
+        --card-border: rgba(255, 255, 255, 0.08);
+        --neon-glow: #ea580c;
+        --neon-glow-dim: rgba(234, 88, 12, 0.15);
+        --text-main: #f4f4f5;
+        --text-muted: #a1a1aa;
+        --text-neon: #f97316;
+        --success-color: #10b981;
+        --error-color: #ef4444;
+        --transition-speed: 0.3s;
         --easing: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * { 
         margin: 0; padding: 0; box-sizing: border-box; 
-        font-family: 'Rajdhani', sans-serif; 
+        font-family: 'Inter', sans-serif; 
         -webkit-tap-highlight-color: transparent; 
     }
     
@@ -34,260 +34,257 @@
         overflow-x: hidden; display: flex; justify-content: center; min-height: 100vh;
         -webkit-font-smoothing: antialiased; 
         -moz-osx-font-smoothing: grayscale;
+        background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(234, 88, 12, 0.12), transparent 100%);
     }
     
     .app-container { 
         width: 100%; max-width: 480px; min-height: 100vh; display: flex; flex-direction: column; 
-        position: relative; background: linear-gradient(to bottom, #000, #080808); 
-        border-left: 1px solid rgba(255, 255, 255, 0.05); border-right: 1px solid rgba(255, 255, 255, 0.05); 
+        position: relative; background: transparent; 
+        border-left: 1px solid rgba(255, 255, 255, 0.03); border-right: 1px solid rgba(255, 255, 255, 0.03); 
         overflow: hidden; 
     }
     
     .app-header { 
         position: sticky; top: 0; width: 100%; display: flex; justify-content: space-between; 
-        align-items: center; padding: 15px 20px; background: rgba(0, 0, 0, 0.9); 
-        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        z-index: 100; border-bottom: 1px solid rgba(255, 69, 0, 0.1); 
+        align-items: center; padding: 16px 24px; background: rgba(0, 0, 0, 0.75); 
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.06); 
         transform: translateZ(0); 
     }
     
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .avatar-logo { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--neon-glow); box-shadow: 0 0 10px var(--neon-glow); background: url('https://img.freepik.com/premium-vector/esports-logo-game-mascot_139366-1076.jpg') center/cover; overflow: hidden; }
-    .header-titles .title { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 700; color: #fff; letter-spacing: 1px; text-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
-    .header-titles .subtitle { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .avatar-logo { width: 40px; height: 40px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 2px 8px rgba(0,0,0,0.5); background: url('https://img.freepik.com/premium-vector/esports-logo-game-mascot_139366-1076.jpg') center/cover; overflow: hidden; }
+    .header-titles .title { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
+    .header-titles .subtitle { font-family: 'Rajdhani', sans-serif; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 2px; }
     
     .wallet-box { 
-        background: #000; border: 2px solid var(--neon-glow); border-radius: 8px; padding: 8px 15px; 
-        box-shadow: 0 0 12px var(--neon-glow-dim); font-family: 'Orbitron', sans-serif; font-size: 0.85rem; 
-        font-weight: 700; color: #fff; text-shadow: 0 0 5px var(--neon-glow-dim); 
+        background: #121214; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 8px 14px; 
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04); font-family: 'Inter', sans-serif; font-size: 0.85rem; 
+        font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px;
         transition: all var(--transition-speed) var(--easing); 
         transform: translateZ(0); backface-visibility: hidden;
     }
-    .wallet-box i { color: var(--text-neon); margin-right: 5px; }
-    .wallet-pulse { animation: walletFlash 0.6s var(--easing) forwards; }
+    .wallet-box i { color: var(--text-neon); font-size: 0.9rem; }
+    .wallet-pulse { animation: walletFlash 0.5s var(--easing) forwards; }
     
-    .main-content { flex: 1; position: relative; width: 100%; padding: 30px 20px 100px; }
+    .main-content { flex: 1; position: relative; width: 100%; padding: 24px 20px 100px; }
     
     .page-section { 
         display: none; width: 100%; 
-        animation: fadeSlideUp 0.5s var(--easing) forwards; 
+        animation: fadeSlideUp 0.4s var(--easing) forwards; 
         will-change: opacity, transform; 
     }
     .page-section.active { display: flex; flex-direction: column; align-items: center; }
     
     .dashboard-card { 
         width: 100%; background: var(--main-card-bg); 
-        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
-        border: 2px solid var(--card-border); border-radius: 20px; padding: 30px; 
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 25px var(--neon-glow-dim), inset 0 0 15px var(--neon-glow-dim); 
+        border: 1px solid var(--card-border); border-radius: 16px; padding: 24px; 
+        box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.03); 
         display: flex; flex-direction: column; align-items: center; 
-        animation: cardFloat 6s ease-in-out infinite; 
-        will-change: transform; transform: translateZ(0); 
+        transform: translateZ(0); 
     }
     
-    .card-title { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900; color: var(--text-neon); text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px var(--neon-glow); margin-bottom: 25px; text-align: center; }
-    .form-section { width: 100%; margin-bottom: 25px; position: relative; }
-    .input-label { display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem; color: var(--text-main); margin-bottom: 10px; letter-spacing: 1px; text-transform: uppercase; }
-    .error-msg { color: var(--error-color); font-size: 0.8rem; display: none; text-shadow: 0 0 5px rgba(255,0,51,0.5); }
+    .card-title { font-family: 'Rajdhani', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 24px; text-align: center; display: flex; align-items: center; gap: 12px; width: 100%; }
+    .card-title::before, .card-title::after { content: ''; height: 1px; flex: 1; display: block; }
+    .card-title::before { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1)); }
+    .card-title::after { background: linear-gradient(-90deg, transparent, rgba(255,255,255,0.1)); }
+    
+    .form-section { width: 100%; margin-bottom: 24px; position: relative; }
+    .input-label { display: flex; justify-content: space-between; font-weight: 600; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .error-msg { color: var(--error-color); font-size: 0.75rem; display: none; font-weight: 500; }
     .uid-input-wrapper { width: 100%; position: relative; }
     
     .uid-input { 
-        width: 100%; background-color: #000; border: 1px solid rgba(255, 255, 255, 0.1); 
-        border-radius: 10px; padding: 16px; color: #fff; font-size: 1.1rem; letter-spacing: 2px; 
+        width: 100%; background-color: #121214; border: 1px solid rgba(255, 255, 255, 0.1); 
+        border-radius: 10px; padding: 14px 16px; color: #fff; font-size: 1rem; letter-spacing: 0.5px; 
         outline: none; transition: all var(--transition-speed) var(--easing); 
-        transform: translateZ(0);
+        transform: translateZ(0); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
     }
     select.uid-input { appearance: none; -webkit-appearance: none; cursor: pointer; }
-    .uid-input:focus { border-color: var(--neon-glow); box-shadow: 0 0 15px var(--neon-glow); }
-    .uid-input::placeholder { color: rgba(255, 255, 255, 0.2); font-family: 'Rajdhani', sans-serif; letter-spacing: 0; }
+    .uid-input:focus { border-color: var(--text-neon); background-color: #18181b; box-shadow: 0 0 0 1px var(--text-neon), 0 0 0 4px rgba(234, 88, 12, 0.1), inset 0 2px 4px rgba(0,0,0,0.2); }
+    .uid-input::placeholder { color: rgba(255, 255, 255, 0.3); font-family: 'Inter', sans-serif; font-weight: 400; letter-spacing: 0; }
     input[type="text"]::-webkit-inner-spin-button, input[type="text"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     
-    .plans-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; }
+    .plans-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; }
     .plan-card { 
-        background-color: #000; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; 
-        padding: 18px; cursor: pointer; display: flex; flex-direction: column; position: relative;
+        background-color: #121214; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; 
+        padding: 16px; cursor: pointer; display: flex; flex-direction: column; position: relative;
         transition: all var(--transition-speed) var(--easing); 
-        transform: translateZ(0); backface-visibility: hidden;
+        transform: translateZ(0); backface-visibility: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
-    .plan-card:hover { transform: translateY(-3px) translateZ(0); border-color: rgba(255, 69, 0, 0.2); box-shadow: 0 5px 15px rgba(255, 69, 0, 0.1); }
-    .plan-card.active { border: 2px solid var(--neon-glow); box-shadow: 0 0 15px var(--neon-glow); animation: pulseActiveCard 2s var(--easing) infinite alternate; }
+    .plan-card:hover { transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.15); background-color: #18181b; box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
+    .plan-card.active { border-color: var(--text-neon); background-color: rgba(234, 88, 12, 0.05); box-shadow: 0 0 0 1px var(--text-neon), 0 8px 24px rgba(234, 88, 12, 0.08); transform: translateY(-2px); }
+    .plan-card:active { transform: scale(0.98); }
     
-    .plan-title { font-weight: 700; font-size: 1rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: flex; align-items: center; }
-    .plan-title i { color: var(--text-neon); margin-right: 8px; }
-    .plan-price { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; font-weight: 900; color: var(--text-neon); margin: 5px 0; }
-    .plan-details { font-size: 0.8rem; color: var(--text-muted); margin-top: 5px; }
+    .plan-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: flex; align-items: center; transition: color var(--transition-speed) var(--easing); }
+    .plan-card.active .plan-title { color: var(--text-main); }
+    .plan-title i { color: var(--text-neon); margin-right: 6px; font-size: 0.85rem; opacity: 0.9; }
+    .plan-price { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text-main); margin: 2px 0; transition: color var(--transition-speed) var(--easing); }
+    .plan-card.active .plan-price { color: var(--text-neon); }
+    .plan-details { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
     
     .countries-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
     .country-card { 
-        background-color: #000; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 10px; 
-        padding: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; 
-        text-align: center; font-weight: 600; color: #fff; font-size: 0.95rem;
+        background-color: #121214; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; 
+        padding: 12px 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; 
+        text-align: center; font-weight: 600; color: var(--text-muted); font-size: 0.85rem;
         transition: all var(--transition-speed) var(--easing); 
-        transform: translateZ(0); backface-visibility: hidden;
+        transform: translateZ(0); box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
-    .country-card span { margin-left: 8px; font-size: 1.1rem; }
-    .country-card.active { border: 2px solid var(--neon-glow); box-shadow: 0 0 10px var(--neon-glow); transform: scale(1.02) translateZ(0); }
+    .country-card span { margin-left: 6px; font-size: 1.05rem; opacity: 0.6; transition: opacity var(--transition-speed) var(--easing); }
+    .country-card:hover { background-color: #18181b; border-color: rgba(255, 255, 255, 0.15); color: var(--text-main); }
+    .country-card.active { border-color: var(--text-neon); background-color: rgba(234, 88, 12, 0.05); color: var(--text-main); box-shadow: 0 0 0 1px var(--text-neon), 0 4px 12px rgba(234, 88, 12, 0.08); }
+    .country-card.active span { opacity: 1; }
+    .country-card:active { transform: scale(0.97); }
     
-    .continue-btn-container { width: 100%; margin-top: 15px; }
+    .continue-btn-container { width: 100%; margin-top: 12px; }
     .continue-btn { 
-        width: 100%; background: #202020; color: rgba(255, 255, 255, 0.3); font-family: 'Orbitron', sans-serif; 
-        font-weight: 900; font-size: 1.3rem; text-transform: uppercase; border: none; border-radius: 12px; 
-        padding: 18px; cursor: not-allowed; letter-spacing: 3px; 
+        width: 100%; background: #121214; color: rgba(255, 255, 255, 0.3); font-family: 'Rajdhani', sans-serif; 
+        font-weight: 700; font-size: 1.1rem; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; 
+        padding: 16px; cursor: not-allowed; letter-spacing: 1px; 
         transition: all var(--transition-speed) var(--easing); 
-        transform: translateZ(0); backface-visibility: hidden;
+        transform: translateZ(0); box-shadow: none;
     }
-    .continue-btn.enabled { background: linear-gradient(45deg, #ff8000, #ff4500); color: #fff; cursor: pointer; box-shadow: 0 5px 20px var(--neon-glow); text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); }
-    .continue-btn.enabled:hover { box-shadow: 0 8px 25px var(--neon-glow); transform: translateY(-3px) translateZ(0); }
-    .continue-btn.enabled:active { transform: scale(0.96) translateZ(0); box-shadow: 0 3px 10px var(--neon-glow-dim); }
+    .continue-btn.enabled { background: linear-gradient(180deg, #f97316 0%, #ea580c 100%); border: 1px solid #c2410c; color: #fff; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 12px rgba(234, 88, 12, 0.2); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+    .continue-btn.enabled:hover { background: linear-gradient(180deg, #fb923c 0%, #f97316 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 6px 16px rgba(234, 88, 12, 0.25); transform: translateY(-1px); }
+    .continue-btn.enabled:active { transform: scale(0.98); background: #ea580c; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
     
     .bottom-navbar { 
-        position: fixed; bottom: 0; width: 100%; max-width: 480px; background: rgba(18, 18, 18, 0.9); 
-        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        display: flex; justify-content: space-around; align-items: center; padding: 12px 0; 
-        border-top: 2px solid var(--card-border); border-top-left-radius: 15px; border-top-right-radius: 15px; 
-        box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5); z-index: 99; transform: translateZ(0);
+        position: fixed; bottom: 0; width: 100%; max-width: 480px; background: rgba(0, 0, 0, 0.85); 
+        backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+        display: flex; justify-content: space-around; align-items: center; padding: 12px 8px 18px; 
+        border-top: 1px solid rgba(255, 255, 255, 0.08); 
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6); z-index: 99; transform: translateZ(0);
     }
     body.keyboard-open .bottom-navbar { display: none !important; }
     
     .nav-item { 
         display: flex; flex-direction: column; align-items: center; cursor: pointer; color: var(--text-muted); 
-        transition: all var(--transition-speed) var(--easing); transform: translateZ(0); 
+        transition: color var(--transition-speed) var(--easing); flex: 1; padding: 8px 0; border-radius: 10px;
     }
-    .nav-item i { font-size: 1.6rem; margin-bottom: 5px; transition: transform var(--transition-speed) var(--easing); }
-    .nav-item span { font-weight: 600; font-size: 0.8rem; }
-    .nav-item:hover { color: #fff; }
-    .nav-item.active { color: var(--text-neon); text-shadow: 0 0 5px var(--neon-glow); transform: translateY(-4px) translateZ(0); }
-    .nav-item.active i { transform: scale(1.1); }
+    .nav-item i { font-size: 1.25rem; margin-bottom: 6px; transition: transform var(--transition-speed) var(--easing), color var(--transition-speed) var(--easing); }
+    .nav-item span { font-weight: 600; font-size: 0.7rem; letter-spacing: 0.5px; opacity: 0.7; transition: opacity var(--transition-speed) var(--easing); }
+    .nav-item:hover { color: var(--text-main); }
+    .nav-item.active { color: var(--text-main); }
+    .nav-item.active i { color: var(--text-neon); transform: translateY(-2px); text-shadow: 0 2px 8px rgba(234, 88, 12, 0.4); }
+    .nav-item.active span { opacity: 1; }
     
     .toast { 
         position: fixed; top: -100px; left: 50%; transform: translateX(-50%) translateZ(0); 
-        background: rgba(0,0,0,0.9); border: 1px solid var(--error-color); border-radius: 8px; 
-        padding: 12px 25px; color: #fff; font-weight: 600; font-family: 'Rajdhani'; 
-        box-shadow: 0 5px 15px rgba(255,0,51,0.4); z-index: 1000; 
-        transition: top 0.5s var(--easing); display: flex; align-items: center; gap: 10px; will-change: top;
+        background: #18181b; border: 1px solid var(--error-color); border-radius: 10px; 
+        padding: 14px 20px; color: #fff; font-weight: 500; font-size: 0.9rem; letter-spacing: 0.2px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04); z-index: 1000; 
+        transition: top 0.4s var(--easing); display: flex; align-items: center; gap: 12px; will-change: top;
     }
-    .toast.show { top: 20px; }
+    .toast.show { top: 24px; }
     
     .modal-overlay { 
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); 
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); 
         backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         display: flex; justify-content: center; align-items: center; z-index: 999; opacity: 0; 
-        pointer-events: none; transition: opacity 0.4s var(--easing); will-change: opacity; transform: translateZ(0);
+        pointer-events: none; transition: opacity 0.3s var(--easing); will-change: opacity; transform: translateZ(0);
     }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
     .modal-card { 
-        background: var(--bg-color); border: 2px solid var(--neon-glow); border-radius: 16px; 
-        padding: 30px; width: 90%; max-width: 360px; text-align: center; box-shadow: 0 0 30px var(--neon-glow-dim); 
-        transform: scale(0.9) translate3d(0, 20px, 0); transition: all 0.4s var(--easing); will-change: transform; 
+        background: var(--main-card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; 
+        padding: 32px 24px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 24px 48px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.05); 
+        transform: scale(0.95) translate3d(0, 10px, 0); transition: all 0.3s var(--easing); will-change: transform; 
     }
     .modal-overlay.active .modal-card { transform: scale(1) translate3d(0, 0, 0); }
     
-    .modal-text { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; margin-bottom: 10px; color: #fff; }
-    .modal-subtext { color: var(--text-muted); margin-bottom: 25px; font-size: 1rem; }
-    .modal-price-highlight { color: var(--text-neon); font-weight: bold; font-size: 1.2rem; }
-    .modal-actions { display: flex; gap: 15px; }
+    .modal-text { font-family: 'Rajdhani', sans-serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #fff; letter-spacing: 0.5px; }
+    .modal-subtext { color: var(--text-muted); margin-bottom: 24px; font-size: 0.9rem; font-weight: 500; }
+    .modal-price-highlight { color: var(--text-neon); font-weight: 600; font-size: 1.15rem; }
+    .modal-actions { display: flex; gap: 12px; }
     .btn-modal { 
-        flex: 1; padding: 12px; border-radius: 8px; font-weight: 700; font-family: 'Orbitron'; border: none; 
+        flex: 1; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.3px; border: none; 
         cursor: pointer; transition: all var(--transition-speed) var(--easing); transform: translateZ(0); backface-visibility: hidden;
     }
-    .btn-cancel { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
-    .btn-cancel:hover { background: rgba(255,255,255,0.1); color: #fff; transform: translateY(-2px); }
-    .btn-proceed { background: var(--success-color); color: #000; box-shadow: 0 0 15px rgba(0,255,0,0.3); }
-    .btn-proceed:hover { box-shadow: 0 0 25px rgba(0,255,0,0.6); transform: translateY(-2px); }
+    .btn-cancel { background: #18181b; border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); }
+    .btn-cancel:hover { background: #27272a; transform: translateY(-1px); }
+    .btn-cancel:active { transform: scale(0.98); }
+    .btn-proceed { background: var(--success-color); color: #000; box-shadow: inset 0 1px 0 rgba(255,255,255,0.3); }
+    .btn-proceed:hover { background: #34d399; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(255,255,255,0.4); }
+    .btn-proceed:active { transform: scale(0.98); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
     
-    .loader-container { display: none; flex-direction: column; align-items: center; gap: 20px; }
-    .spinner { width: 50px; height: 50px; border: 5px solid rgba(255, 69, 0, 0.2); border-top: 5px solid var(--neon-glow); border-radius: 50%; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-    .status-msg { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 700; text-shadow: 0 0 10px var(--neon-glow-dim); }
+    .loader-container { display: none; flex-direction: column; align-items: center; gap: 16px; }
+    .spinner { width: 36px; height: 36px; border: 3px solid rgba(255, 255, 255, 0.1); border-top: 3px solid var(--text-neon); border-radius: 50%; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+    .status-msg { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.3px; }
     
-    @keyframes cardFloat { 
-        0%, 100% { transform: translate3d(0, 0, 0); } 
-        50% { transform: translate3d(0, -8px, 0); } 
-    }
-    @keyframes pulseActiveCard { 
-        from { box-shadow: 0 0 10px var(--neon-glow); border-color: var(--neon-glow); } 
-        to { box-shadow: 0 0 20px #ff8000; border-color: #ff8000; } 
-    }
     @keyframes fadeSlideUp { 
-        from { opacity: 0; transform: translate3d(0, 20px, 0); } 
+        from { opacity: 0; transform: translate3d(0, 10px, 0); } 
         to { opacity: 1; transform: translate3d(0, 0, 0); } 
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     @keyframes walletFlash { 
-        0% { transform: scale(1) translateZ(0); border-color: var(--neon-glow); } 
-        50% { transform: scale(1.08) translateZ(0); border-color: var(--success-color); box-shadow: 0 0 20px var(--success-color); } 
-        100% { transform: scale(1) translateZ(0); border-color: var(--neon-glow); } 
+        0% { transform: scale(1); border-color: rgba(255, 255, 255, 0.08); } 
+        50% { transform: scale(1.02); border-color: var(--success-color); box-shadow: 0 0 12px rgba(16, 185, 129, 0.15); } 
+        100% { transform: scale(1); border-color: rgba(255, 255, 255, 0.08); } 
     }
     
-    .text-success { color: var(--success-color) !important; text-shadow: 0 0 10px rgba(0,255,0,0.5) !important; transition: color 0.3s var(--easing); }
-    .text-neon { color: var(--text-neon) !important; text-shadow: 0 0 10px var(--neon-glow) !important; transition: color 0.3s var(--easing); }
+    .text-success { color: var(--success-color) !important; transition: color 0.3s var(--easing); }
+    .text-neon { color: var(--text-neon) !important; transition: color 0.3s var(--easing); }
     
-    .tx-card { background: rgba(0,0,0,0.6); border: 1px solid var(--card-border); border-radius: 10px; padding: 15px; margin-bottom: 12px; width: 100%; transition: transform var(--transition-speed) var(--easing); will-change: transform; transform: translateZ(0); }
-    .tx-card:hover { transform: translateY(-2px) translateZ(0); }
-    .tx-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .tx-email { font-size: 0.9rem; color: var(--text-main); font-weight: bold; word-break: break-all; }
-    .tx-status { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: bold; padding: 3px 8px; border-radius: 5px; text-transform: uppercase; }
-    .tx-status.pending { color: #ffcc00; background: rgba(255, 204, 0, 0.1); border: 1px solid #ffcc00; }
-    .tx-status.verified { color: var(--success-color); background: rgba(0, 255, 0, 0.1); border: 1px solid var(--success-color); }
-    .tx-status.rejected { color: var(--error-color); background: rgba(255, 0, 51, 0.1); border: 1px solid var(--error-color); }
-    .tx-details { font-size: 0.85rem; color: var(--text-muted); }
-    .tx-highlight { color: var(--text-neon); font-weight: bold; font-family: 'Orbitron', sans-serif; }
+    .tx-card { background: #121214; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; width: 100%; transition: transform var(--transition-speed) var(--easing), background 0.3s, border-color 0.3s; will-change: transform; transform: translateZ(0); box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    .tx-card:hover { transform: translateY(-2px); background: #18181b; border-color: rgba(255,255,255,0.12); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .tx-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .tx-email { font-size: 0.85rem; color: var(--text-main); font-weight: 600; word-break: break-all; }
+    .tx-status { font-family: 'Rajdhani', sans-serif; font-size: 0.75rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .tx-status.pending { color: #f59e0b; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); }
+    .tx-status.verified { color: var(--success-color); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .tx-status.rejected { color: var(--error-color); background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); }
+    .tx-details { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+    .tx-highlight { color: var(--text-neon); font-weight: 600; }
     
-    .chat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--neon-glow-dim); padding-bottom: 10px; width: 100%; }
-    .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; transform: translateZ(0); }
-    .status-live { background: var(--success-color); box-shadow: 0 0 8px var(--success-color); animation: pulseLive 2s var(--easing) infinite; }
-    .status-offline { background: var(--error-color); box-shadow: 0 0 8px var(--error-color); }
-    @keyframes pulseLive { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.7; } }
+    .chat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 14px; width: 100%; }
+    .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; transform: translateZ(0); }
+    .status-live { background: var(--success-color); box-shadow: 0 0 8px rgba(16,185,129,0.4); animation: pulseLive 2s var(--easing) infinite; }
+    .status-offline { background: var(--error-color); }
+    @keyframes pulseLive { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } }
     
     .chat-box { 
-        height: 320px; width: 100%; overflow-y: auto; background: rgba(0,0,0,0.5); border-radius: 10px; 
-        padding: 10px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; 
-        border: 1px solid var(--card-border); scroll-behavior: smooth; 
+        height: 320px; width: 100%; overflow-y: auto; background: #000; border-radius: 12px; 
+        padding: 16px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; 
+        border: 1px solid rgba(255,255,255,0.06); scroll-behavior: smooth; 
         -webkit-overflow-scrolling: touch;
-        will-change: scroll-position;
+        will-change: scroll-position; box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
     }
     
-    .chat-msg { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; word-break: break-word; animation: fadeSlideUp 0.4s var(--easing) forwards; position: relative; transform: translateZ(0); }
-    .chat-msg.user { align-self: flex-end; background: rgba(255, 69, 0, 0.15); border: 1px solid var(--neon-glow); color: #fff; border-bottom-right-radius: 0; }
-    .chat-msg.zexi { align-self: flex-start; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-bottom-left-radius: 0; }
+    .chat-msg { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; font-weight: 500; word-break: break-word; animation: fadeSlideUp 0.3s var(--easing) forwards; position: relative; transform: translateZ(0); line-height: 1.4; }
+    .chat-msg.user { align-self: flex-end; background: #c2410c; border: 1px solid #ea580c; color: #fff; border-bottom-right-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .chat-msg.zexi { align-self: flex-start; background: #18181b; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-bottom-left-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     .chat-msg img { max-width: 100%; border-radius: 8px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: transform 0.3s var(--easing); }
     .chat-msg img:hover { transform: scale(1.02); }
-    .chat-msg .sender { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 700; letter-spacing: 0.5px; }
+    .chat-msg .sender { font-size: 0.65rem; color: rgba(255,255,255,0.5); margin-bottom: 4px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; }
     
-    .chat-input-wrapper { display: flex; gap: 10px; align-items: center; width: 100%; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); transform: translateZ(0); }
-    .chat-input { flex: 1; background: transparent; border: none; color: #fff; padding: 8px 5px; font-size: 1rem; outline: none; }
-    .chat-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+    .chat-input-wrapper { display: flex; gap: 8px; align-items: center; width: 100%; background: #121214; padding: 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); transform: translateZ(0); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    .chat-input { flex: 1; background: transparent; border: none; color: #fff; padding: 10px; font-size: 0.9rem; outline: none; }
+    .chat-input::placeholder { color: rgba(255, 255, 255, 0.3); font-weight: 400; }
     
     .chat-btn { 
-        background: var(--neon-glow); color: #fff; border: none; height: 40px; width: 40px; border-radius: 8px; 
-        cursor: pointer; transition: all var(--transition-speed) var(--easing); font-size: 1.1rem; 
-        display: flex; align-items: center; justify-content: center; transform: translateZ(0); backface-visibility: hidden;
+        background: linear-gradient(180deg, #f97316 0%, #ea580c 100%); color: #fff; border: 1px solid #c2410c; height: 38px; width: 38px; border-radius: 8px; 
+        cursor: pointer; transition: all var(--transition-speed) var(--easing); font-size: 1rem; 
+        display: flex; align-items: center; justify-content: center; transform: translateZ(0); backface-visibility: hidden; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(234, 88, 12, 0.2);
     }
-    .chat-btn:disabled { background: #333; cursor: not-allowed; color: #777; }
-    .chat-btn:not(:disabled):hover { box-shadow: 0 0 15px var(--neon-glow); transform: scale(1.08) translateZ(0); }
-    .chat-upload-label { cursor: pointer; color: var(--text-muted); font-size: 1.4rem; padding: 5px; transition: color var(--transition-speed) var(--easing); }
-    .chat-upload-label:hover { color: var(--text-neon); text-shadow: 0 0 10px var(--neon-glow); }
+    .chat-btn:disabled { background: #18181b; border: 1px solid rgba(255,255,255,0.05); cursor: not-allowed; color: rgba(255,255,255,0.2); box-shadow: none; }
+    .chat-btn:not(:disabled):hover { background: linear-gradient(180deg, #fb923c 0%, #f97316 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 4px 8px rgba(234, 88, 12, 0.2); transform: translateY(-1px); }
+    .chat-btn:not(:disabled):active { transform: scale(0.96); background: #ea580c; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    .chat-upload-label { cursor: pointer; color: var(--text-muted); font-size: 1.2rem; padding: 6px 10px; transition: color var(--transition-speed) var(--easing); display: flex; align-items: center; justify-content: center; }
+    .chat-upload-label:hover { color: var(--text-main); }
     
-    .chat-box::-webkit-scrollbar { width: 6px; }
-    .chat-box::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; }
-    .chat-box::-webkit-scrollbar-thumb { background: rgba(255, 69, 0, 0.5); border-radius: 10px; }
-    .chat-box::-webkit-scrollbar-thumb:hover { background: var(--neon-glow); }
+    .chat-box::-webkit-scrollbar { width: 4px; }
+    .chat-box::-webkit-scrollbar-track { background: transparent; }
+    .chat-box::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
+    .chat-box::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
     </style>
 </head>
 <body>
 
-    <div id="authOverlay" style="display: none;">
-        <div id="authBox" style="background: var(--main-card-bg); border: 2px solid var(--neon-glow); border-radius: 16px; padding: 40px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 30px var(--neon-glow-dim);">
-            <h1 class="card-title">LOGIN</h1>
-            <input type="email" id="loginEmail" class="uid-input" placeholder="Enter your email" style="margin-bottom: 20px;">
-            <button id="loginBtn" class="continue-btn enabled">ACCESS TOOL</button>
-        </div>
-    </div>
-
-    <div class="app-container" id="mainApp" style="display: none;">
+    <div class="app-container" id="mainApp">
         
         <div id="toast" class="toast">
-            <i class="fas fa-exclamation-circle"></i>
-            <span id="toast-msg">Error Message</span>
+            <i class="fas fa-info-circle"></i>
+            <span id="toast-msg">Message</span>
         </div>
 
         <header class="app-header">
@@ -295,11 +292,11 @@
                 <div class="avatar-logo"></div>
                 <div class="header-titles">
                     <div class="title">ZEXI TOOL</div>
-                    <div class="subtitle">FREE FIRE TCP & CLAN BOT MAKER</div>
+                    <div class="subtitle">FREE FIRE TCP & CLAN BOT</div>
                 </div>
             </div>
             <div class="wallet-box" id="walletBox">
-                <i class="fas fa-wallet"></i> Wallet: <span id="walletAmount">₹0</span>
+                <i class="fas fa-wallet"></i> <span id="walletAmount">₹0</span>
             </div>
         </header>
 
@@ -307,11 +304,11 @@
             
             <div id="section-home" class="page-section active">
                 <div class="dashboard-card">
-                    <h1 class="card-title">ZEXI DASHBOARD</h1>
+                    <div class="card-title">DASHBOARD</div>
                     <div class="form-section">
                         <div class="input-label">
                             <span>ENTER GUILD UID</span>
-                            <span class="error-msg" id="uidError">Invalid UID ❌</span>
+                            <span class="error-msg" id="uidError">Invalid UID</span>
                         </div>
                         <div class="uid-input-wrapper">
                             <input type="text" id="guildUid" class="uid-input" placeholder="e.g. 1234567890" inputmode="numeric">
@@ -321,29 +318,34 @@
                         <label class="input-label">SELECT PLAN</label>
                         <div class="plans-grid">
                             <div class="plan-card active" data-plan="starter" data-price="350">
-                                <div class="plan-title"><i class="fas fa-fire"></i> STARTER</div>
+                                <div class="plan-title"><i class="fas fa-bolt"></i> STARTER</div>
                                 <div class="plan-price">₹350</div>
                                 <div class="plan-details">4 Bots • 2 Lakh+</div>
                             </div>
                             <div class="plan-card" data-plan="mini" data-price="650">
-                                <div class="plan-title"><i class="fas fa-fire"></i> MINI PACK</div>
+                                <div class="plan-title"><i class="fas fa-bolt"></i> MINI PACK</div>
                                 <div class="plan-price">₹650</div>
                                 <div class="plan-details">8 Bots • 5 Lakh+</div>
                             </div>
                             <div class="plan-card" data-plan="basic" data-price="950">
-                                <div class="plan-title"><i class="fas fa-fire"></i> BASIC PACK</div>
+                                <div class="plan-title"><i class="fas fa-bolt"></i> BASIC PACK</div>
                                 <div class="plan-price">₹950</div>
                                 <div class="plan-details">12 Bots • 8 Lakh+</div>
                             </div>
                             <div class="plan-card" data-plan="region" data-price="1250">
-                                <div class="plan-title"><i class="fas fa-fire"></i> REGION PACK</div>
+                                <div class="plan-title"><i class="fas fa-globe"></i> REGION PACK</div>
                                 <div class="plan-price">₹1250</div>
                                 <div class="plan-details">16 Bots • 10 Lakh+</div>
                             </div>
                             <div class="plan-card" data-plan="top_region" data-price="3500">
-                                <div class="plan-title"><i class="fas fa-fire"></i> TOP REGION</div>
+                                <div class="plan-title"><i class="fas fa-trophy"></i> TOP REGION</div>
                                 <div class="plan-price">₹3500</div>
                                 <div class="plan-details">50 Bots • 40 Lakh+</div>
+                            </div>
+                            <div class="plan-card" data-plan="ultra_pro_max" data-price="12000">
+                                <div class="plan-title"><i class="fas fa-crown"></i> ULTRA MAX</div>
+                                <div class="plan-price">₹12000</div>
+                                <div class="plan-details">200 Bots • 2CR+ Glory</div>
                             </div>
                         </div>
                     </div>
@@ -363,27 +365,27 @@
 
             <div id="section-transactions" class="page-section">
                 <div class="dashboard-card">
-                    <h1 class="card-title">TRANSACTIONS</h1>
-                    <div id="transactionList" style="width: 100%; margin-top: 10px;">
-                        <p style="color: var(--text-muted); text-align: center;">Loading...</p>
+                    <div class="card-title">TRANSACTIONS</div>
+                    <div id="transactionList" style="width: 100%; margin-top: 5px;">
+                        <p style="color: var(--text-muted); text-align: center; font-size: 0.9rem;">Loading...</p>
                     </div>
                 </div>
             </div>
 
             <div id="section-help" class="page-section">
-                <div class="dashboard-card" style="padding: 20px;">
+                <div class="dashboard-card" style="padding: 24px;">
                     <div class="chat-header">
                         <div>
-                            <h2 style="font-family: 'Orbitron'; color: #fff; font-size: 1.4rem; letter-spacing: 1px; margin-bottom: 2px;">HELP & SUPPORT</h2>
-                            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Support Agent: <span style="color: var(--text-neon);">ZEXI</span></span>
+                            <div style="font-family: 'Rajdhani', sans-serif; color: #fff; font-size: 1.15rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px;">SUPPORT</div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Agent: <span style="color: var(--text-main);">ZEXI</span></span>
                         </div>
-                        <div style="text-align: right; font-weight: 700; font-family: 'Orbitron'; font-size: 0.9rem; display: flex; align-items: center;">
+                        <div style="text-align: right; font-weight: 600; font-size: 0.8rem; display: flex; align-items: center; color: var(--text-muted);">
                             <span id="supportDot" class="status-dot"></span><span id="supportStatus">...</span>
                         </div>
                     </div>
                     <div id="chatBox" class="chat-box"></div>
-                    <div id="chatPreviewContainer" style="width: 100%; display: none; margin-bottom: 10px; text-align: left;">
-                        <span style="font-size: 0.8rem; background: rgba(255,69,0,0.2); border: 1px solid var(--neon-glow); padding: 4px 10px; border-radius: 12px; color: #fff;"><i class="fas fa-image"></i> Image attached <i class="fas fa-times" id="removeImgBtn" style="margin-left: 8px; cursor: pointer; color: var(--error-color);"></i></span>
+                    <div id="chatPreviewContainer" style="width: 100%; display: none; margin-bottom: 12px; text-align: left;">
+                        <span style="font-size: 0.8rem; background: #18181b; border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 8px; color: #fff; font-weight: 500; display: inline-flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="fas fa-image" style="color: var(--text-neon); margin-right: 8px;"></i> Image attached <i class="fas fa-times" id="removeImgBtn" style="margin-left: 12px; cursor: pointer; color: var(--text-muted); transition: color 0.3s;"></i></span>
                     </div>
                     <div class="chat-input-wrapper">
                         <label for="chatFile" class="chat-upload-label"><i class="fas fa-paperclip"></i></label>
@@ -396,33 +398,33 @@
 
             <div id="section-history" class="page-section">
                 <div class="dashboard-card">
-                    <h1 class="card-title">ORDER HISTORY</h1>
-                    <div id="ordersList" style="width:100%;">
-                        <p style="color: var(--text-muted); text-align: center;">Loading orders...</p>
+                    <div class="card-title">ORDER HISTORY</div>
+                    <div id="ordersList" style="width:100%; margin-top: 5px;">
+                        <p style="color: var(--text-muted); text-align: center; font-size: 0.9rem;">Loading orders...</p>
                     </div>
                 </div>
             </div>
 
             <div id="section-account" class="page-section">
                 <div class="dashboard-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--neon-glow-dim);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.06);">
                         <div style="display: flex; flex-direction: column;">
-                            <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: bold;">Logged In As</span>
-                            <span id="userEmailDisplay" style="color: var(--text-neon); font-weight: bold; font-size: 1.1rem; word-break: break-all;">loading...</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">Account Details</span>
+                            <span id="userEmailDisplay" style="color: var(--text-main); font-weight: 600; font-size: 0.9rem; word-break: break-all;">loading...</span>
                         </div>
-                        <button id="logoutBtn" style="background: rgba(255,0,51,0.2); color: var(--error-color); border: 1px solid var(--error-color); padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;">
-                            <i class="fas fa-sign-out-alt"></i> LOGOUT
+                        <button id="logoutBtn" style="background: #18181b; color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.1); padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-size: 0.8rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                            <i class="fas fa-sign-out-alt" style="color: var(--text-muted);"></i> LOGOUT
                         </button>
                     </div>
 
-                    <h1 class="card-title">PAYMENT</h1>
-                    <p style="color: var(--text-muted); text-align: center; margin-bottom: 20px;">Scan OR Click QR to Pay</p>
-                    <div id="qrWrapper" style="background: #fff; padding: 15px; border-radius: 12px; border: 2px solid var(--neon-glow); cursor: pointer; box-shadow: 0 0 15px var(--neon-glow-dim); transition: 0.3s;">
-                        <img id="qrImage" src="" alt="UPI QR Code" style="width: 200px; height: 200px; display: block; margin: 0 auto;">
+                    <div class="card-title" style="margin-bottom: 16px;">PAYMENT</div>
+                    <p style="color: var(--text-muted); text-align: center; margin-bottom: 20px; font-size: 0.85rem; font-weight: 500;">Scan OR Click QR to Pay</p>
+                    <div id="qrWrapper" style="background: #fff; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.3); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;">
+                        <img id="qrImage" src="" alt="UPI QR Code" style="width: 160px; height: 160px; display: block; margin: 0 auto; border-radius: 6px;">
                     </div>
-                    <p id="qrAmount" style="font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 900; color: var(--text-neon); margin-top: 20px; text-shadow: 0 0 15px var(--neon-glow);">₹350</p>
+                    <p id="qrAmount" style="font-family: 'Orbitron', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--text-main); margin-top: 16px;">₹350</p>
 
-                    <div class="form-section" style="margin-top: 25px;">
+                    <div class="form-section" style="margin-top: 24px;">
                         <label class="input-label">Select Plan for Payment</label>
                         <select id="paymentPlanSelect" class="uid-input" style="margin-bottom: 20px;">
                             <option value="350">STARTER - ₹350</option>
@@ -430,15 +432,16 @@
                             <option value="950">BASIC PACK - ₹950</option>
                             <option value="1250">REGION PACK - ₹1250</option>
                             <option value="3500">TOP REGION - ₹3500</option>
+                            <option value="12000">ULTRA MAX - ₹12000</option>
                         </select>
                         <div class="input-label">
                             <span>ENTER UTR NUMBER</span>
-                            <span class="error-msg" id="utrErrorMsg">Invalid UTR ❌</span>
+                            <span class="error-msg" id="utrErrorMsg">Invalid UTR</span>
                         </div>
                         <div class="uid-input-wrapper">
                             <input type="text" id="utrInput" class="uid-input" placeholder="Enter UTR (12+ characters)" maxlength="20" style="text-transform: uppercase;">
                         </div>
-                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; text-align: center;">Enter 12-digit UTR/Reference No. after payment</p>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px; text-align: center; font-weight: 500;">Enter 12-digit UTR/Reference No. after payment</p>
                     </div>
                     <div class="continue-btn-container">
                         <button id="submitPaymentBtn" class="continue-btn" disabled>SUBMIT PAYMENT</button>
@@ -448,26 +451,26 @@
         </main>
 
         <footer class="bottom-navbar">
-            <div class="nav-item active" data-target="section-home"><i class="fas fa-bolt"></i><span>Home</span></div>
+            <div class="nav-item active" data-target="section-home"><i class="fas fa-border-all"></i><span>Home</span></div>
             <div class="nav-item" data-target="section-transactions"><i class="fas fa-exchange-alt"></i><span>History</span></div>
             <div class="nav-item" data-target="section-help"><i class="fas fa-headset"></i><span>Help</span></div>
-            <div class="nav-item" data-target="section-history"><i class="fas fa-list-alt"></i><span>Orders</span></div>
-            <div class="nav-item" data-target="section-account"><i class="fas fa-qrcode"></i><span>Pay/Acc</span></div>
+            <div class="nav-item" data-target="section-history"><i class="fas fa-receipt"></i><span>Orders</span></div>
+            <div class="nav-item" data-target="section-account"><i class="fas fa-wallet"></i><span>Pay/Acc</span></div>
         </footer>
 
         <div id="paymentModal" class="modal-overlay">
             <div class="modal-card">
                 <div id="modalStepConfirm">
-                    <div class="modal-text">Confirm Purchase?</div>
+                    <div class="modal-text">Confirm Purchase</div>
                     <div class="modal-subtext">Total Amount: <span class="modal-price-highlight" id="confirmPrice">₹0</span></div>
                     <div class="modal-actions">
-                        <button class="btn-modal btn-cancel" id="btnCancel">❌ Cancel</button>
-                        <button class="btn-modal btn-proceed" id="btnProceed">✅ Proceed</button>
+                        <button class="btn-modal btn-cancel" id="btnCancel">Cancel</button>
+                        <button class="btn-modal btn-proceed" id="btnProceed">Proceed</button>
                     </div>
                 </div>
                 <div id="modalStepProcess" class="loader-container">
                     <div class="spinner" id="modalSpinner"></div>
-                    <div class="status-msg text-neon" id="modalStatusMsg">Processing Payment...</div>
+                    <div class="status-msg text-main" id="modalStatusMsg">Processing System...</div>
                 </div>
             </div>
         </div>
@@ -512,20 +515,15 @@ let unsubChat = null;
 let unsubOrders = null;
 
 const el = (id) => document.getElementById(id);
-const mainApp = el('mainApp');
-const authOverlay = el('authOverlay');
 const walletAmountEl = el('walletAmount');
 const walletBox = el('walletBox');
 const userEmailDisplay = el('userEmailDisplay');
 const toastEl = el('toast');
 const toastMsg = el('toast-msg');
 
-// ==========================================
-// SOUND SYSTEM
-// ==========================================
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-function playTone(freq, type, duration, vol = 0.1) {
+function playTone(freq, type, duration, vol = 0.01) {
     if (!audioCtx) return;
     if (audioCtx.state === 'suspended') audioCtx.resume();
     const osc = audioCtx.createOscillator();
@@ -541,10 +539,10 @@ function playTone(freq, type, duration, vol = 0.1) {
 }
 
 const sounds = {
-    click: () => playTone(600, 'sine', 0.1, 0.05),
-    success: () => { playTone(880, 'sine', 0.1, 0.1); setTimeout(() => playTone(1100, 'sine', 0.15, 0.1), 100); },
-    error: () => { playTone(300, 'square', 0.2, 0.1); setTimeout(() => playTone(250, 'square', 0.2, 0.1), 150); },
-    notification: () => playTone(750, 'triangle', 0.15, 0.05)
+    click: () => playTone(300, 'sine', 0.05, 0.005),
+    success: () => { playTone(500, 'sine', 0.08, 0.01); setTimeout(() => playTone(700, 'sine', 0.1, 0.01), 80); },
+    error: () => { playTone(200, 'triangle', 0.1, 0.01); setTimeout(() => playTone(150, 'triangle', 0.15, 0.01), 100); },
+    notification: () => playTone(400, 'sine', 0.1, 0.01)
 };
 
 document.addEventListener('click', (e) => {
@@ -566,10 +564,10 @@ function debounce(func, wait) {
 function showToast(msg, isSuccess = false) {
     if (!toastEl || !toastMsg) return;
     toastMsg.innerText = msg;
-    toastEl.style.borderColor = isSuccess ? "var(--success-color)" : "var(--error-color)";
-    toastEl.style.boxShadow = isSuccess ? "0 5px 15px rgba(0,255,0,0.4)" : "0 5px 15px rgba(255,0,51,0.4)";
+    toastEl.style.borderColor = isSuccess ? "var(--success-color)" : "rgba(255,255,255,0.08)";
+    toastEl.style.boxShadow = isSuccess ? "0 8px 24px rgba(16,185,129,0.2), 0 0 0 1px rgba(16,185,129,0.1)" : "0 8px 24px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)";
     toastEl.classList.add('show');
-    if (isSuccess) sounds.success(); else sounds.error();
+    if (isSuccess) sounds.success(); else sounds.notification();
     setTimeout(() => toastEl.classList.remove('show'), 3000);
 }
 
@@ -581,54 +579,40 @@ function cleanupListeners() {
     if (unsubOrders) { unsubOrders(); unsubOrders = null; }
 }
 
-// ==========================================
-// AUTHENTICATION
-// ==========================================
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     if (user) {
         userEmail = user.email;
         authUid = user.uid; 
-        if (authOverlay) authOverlay.style.display = 'none';
-        if (mainApp) mainApp.style.display = 'flex';
         if (userEmailDisplay) userEmailDisplay.innerText = userEmail;
         initApp();
     } else {
         cleanupListeners();
-        if (authOverlay) authOverlay.style.display = 'flex';
-        if (mainApp) mainApp.style.display = 'none';
-    }
-});
-
-if(el('loginBtn')) {
-    el('loginBtn').addEventListener('click', async () => {
-        const email = el('loginEmail').value.trim();
-        if(!email) return showToast("Enter a valid email");
-        
-        el('loginBtn').disabled = true;
-        el('loginBtn').innerText = "CONNECTING...";
-        
+        let localGuest = localStorage.getItem("zexi_guest_email");
+        if (!localGuest) {
+            localGuest = "guest_" + Math.random().toString(36).substring(2, 10) + "@zexi.com";
+            localStorage.setItem("zexi_guest_email", localGuest);
+        }
         const pwd = "zexi_user_secure_123";
         try {
-            await signInWithEmailAndPassword(auth, email, pwd);
-            sounds.success();
+            await signInWithEmailAndPassword(auth, localGuest, pwd);
         } catch(e) {
             try {
-                await createUserWithEmailAndPassword(auth, email, pwd);
-                sounds.success();
+                await createUserWithEmailAndPassword(auth, localGuest, pwd);
             } catch(err) {
-                showToast("Login Failed");
-                el('loginBtn').disabled = false;
-                el('loginBtn').innerText = "ACCESS TOOL";
+                console.error("Auto login failed", err);
+                showToast("System connecting...");
+                setTimeout(() => window.location.reload(), 2000);
             }
         }
-    });
-}
+    }
+});
 
 if (el('logoutBtn')) {
     el('logoutBtn').addEventListener('click', async () => {
         try {
+            localStorage.removeItem("zexi_guest_email");
             await signOut(auth);
-            window.location.reload();
+            window.location.href = 'index.html';
         } catch (err) {
             console.error("Logout Error:", err);
             showToast("Logout failed");
@@ -636,9 +620,6 @@ if (el('logoutBtn')) {
     });
 }
 
-// ==========================================
-// INITIALIZE APP (SINGLE USER ID SYSTEM)
-// ==========================================
 function initApp() {
     cleanupListeners();
     isUserInitialLoad = true;
@@ -646,37 +627,35 @@ function initApp() {
     isOrderInitialLoad = true;
     isChatInitialLoad = true;
 
-    // Admin Status
     const statusEl = el('supportStatus');
     const dotEl = el('supportDot');
     if (statusEl && dotEl) {
-        statusEl.innerText = 'CHECKING...';
+        statusEl.innerText = 'CHECKING';
         dotEl.className = 'status-dot status-offline';
         unsubAdmin = onSnapshot(doc(db, "admin_status", "status"), (docSnap) => {
             requestAnimationFrame(() => {
                 let isOnline = docSnap.exists() && docSnap.data()?.online === true;
-                statusEl.innerText = isOnline ? 'LIVE' : 'OFFLINE';
-                statusEl.style.color = isOnline ? 'var(--success-color)' : 'var(--error-color)';
+                statusEl.innerText = isOnline ? 'ONLINE' : 'OFFLINE';
+                statusEl.style.color = isOnline ? 'var(--text-main)' : 'var(--text-muted)';
                 dotEl.className = isOnline ? 'status-dot status-live' : 'status-dot status-offline';
             });
         });
     }
 
-    // User Wallet & Status (Strict UID matching)
     const userRef = doc(db, "users", authUid);
     unsubUser = onSnapshot(userRef, (docSnap) => {
         requestAnimationFrame(() => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 if (data.status === 'banned') {
-                    document.body.innerHTML = `<h1 style="color:var(--error-color); text-align:center; font-family:'Orbitron'; margin-top:50px;">YOUR ACCOUNT IS BANNED</h1>`;
+                    document.body.innerHTML = `<h1 style="color:var(--error-color); text-align:center; font-family:'Inter'; margin-top:50px;">ACCOUNT RESTRICTED</h1>`;
                     cleanupListeners();
                     return;
                 }
                 
                 if (!isUserInitialLoad && walletBalance < (data.wallet || 0)) {
                     sounds.success();
-                    showToast("Wallet Credited! ✅", true);
+                    showToast("Wallet Credited", true);
                     if (walletBox) {
                         walletBox.classList.remove('wallet-pulse');
                         void walletBox.offsetWidth;
@@ -693,16 +672,15 @@ function initApp() {
         });
     });
 
-    // Transactions (Strict UID matching)
     const txQuery = query(collection(db, "transactions"), where("uid", "==", authUid));
     unsubTx = onSnapshot(txQuery, (snap) => {
         if (!isTxInitialLoad) {
             snap.docChanges().forEach(change => {
                 if (change.type === "modified" && change.doc.data().status === 'Verified') {
-                    showToast("Transaction Verified! ✅", true);
+                    showToast("Payment Verified", true);
                     sounds.success();
                 } else if (change.type === "modified" && change.doc.data().status === 'Rejected') {
-                    showToast("Transaction Rejected ❌");
+                    showToast("Payment Rejected");
                     sounds.error();
                 }
             });
@@ -715,7 +693,6 @@ function initApp() {
         requestAnimationFrame(() => renderTransactions(txs));
     });
 
-    // Chat (Strict UID matching)
     const chatQuery = query(collection(db, "chats"), where("uid", "==", authUid));
     unsubChat = onSnapshot(chatQuery, (snap) => {
         if (!isChatInitialLoad) {
@@ -733,13 +710,12 @@ function initApp() {
         requestAnimationFrame(() => renderChat(msgs));
     });
 
-    // Orders (Strict UID matching)
     const ordersQuery = query(collection(db, "orders"), where("uid", "==", authUid));
     unsubOrders = onSnapshot(ordersQuery, (snap) => {
         if (!isOrderInitialLoad) {
             snap.docChanges().forEach(change => {
                 if (change.type === "added") {
-                    showToast("New Order Created! 🚀", true);
+                    showToast("Order Active", true);
                     sounds.success();
                 }
             });
@@ -758,7 +734,7 @@ function initApp() {
 function renderTransactions(txList) {
     const list = el('transactionList');
     if (!list) return;
-    if (txList.length === 0) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No recent transactions.</p>'; return; }
+    if (txList.length === 0) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center; font-size: 0.85rem; margin-top: 20px;">No recent transactions.</p>'; return; }
     
     list.innerHTML = txList.map(tx => {
         const isVerified = tx.status === 'Verified';
@@ -768,7 +744,7 @@ function renderTransactions(txList) {
         return `<div class="tx-card">
             <div class="tx-row"><span class="tx-email">${tx.email}</span><span class="tx-status ${statusClass}">${tx.status}</span></div>
             <div class="tx-row tx-details"><span>Plan: <span class="tx-highlight">₹${tx.plan}</span></span><span>Game UID: ${tx.gameUid || 'N/A'}</span></div>
-            <div class="tx-row tx-details" style="margin-bottom: 0;"><span>UTR: <span style="color:#fff;">${tx.utr}</span></span><span style="font-size:0.75rem;">${date}</span></div>
+            <div class="tx-row tx-details" style="margin-bottom: 0;"><span>UTR: <span style="color: var(--text-main); font-family: 'Orbitron', sans-serif;">${tx.utr}</span></span><span style="font-size:0.75rem;">${date}</span></div>
         </div>`;
     }).join('');
 }
@@ -778,7 +754,7 @@ function renderOrders(ords) {
     if (!list) return;
 
     if (ords.length === 0) {
-        list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No orders found.</p>';
+        list.innerHTML = '<p style="color: var(--text-muted); text-align: center; font-size: 0.85rem; margin-top: 20px;">No active orders.</p>';
         return;
     }
 
@@ -788,28 +764,27 @@ function renderOrders(ords) {
         return `
         <div class="tx-card">
             <div class="tx-row">
-                <span class="tx-email">UID: ${"ID#" + Math.floor(10000 + Math.random() * 90000)}</span> <span class="tx-status ${o.status==='Active'?'verified':'rejected'}">${o.status}</span>
+                <span class="tx-email" style="font-family: 'Orbitron', sans-serif;">UID: ${"ID#" + Math.floor(10000 + Math.random() * 90000)}</span> <span class="tx-status ${o.status==='Active'?'verified':'rejected'}">${o.status}</span>
             </div>
 
             <div class="tx-row tx-details">
                 <span>Game UID: ${o.gameUid || 'N/A'}</span>
-                <span>₹${o.plan}</span>
+                <span style="color: var(--text-main); font-weight: 600;">₹${o.plan}</span>
             </div>
 
-            <div class="tx-row tx-details">
+            <div class="tx-row tx-details" style="margin-bottom: 0;">
                 <span>${date}</span>
             </div>
         </div>`;
     }).join('');
 }
 
-
 function renderChat(messages) {
     const chatBox = el('chatBox');
     if (!chatBox) return;
     
     if (messages.length === 0) {
-        chatBox.innerHTML = `<p style="text-align:center; color: var(--text-muted); margin-top: 50px; font-size: 0.9rem;">Start chatting with ZEXI Support</p>`;
+        chatBox.innerHTML = `<p style="text-align:center; color: var(--text-muted); margin-top: 50px; font-size: 0.85rem; font-weight: 500;">Start a conversation with Support</p>`;
         return;
     }
     
@@ -827,9 +802,6 @@ function renderChat(messages) {
     }
 }
 
-// ==========================================
-// CHAT INTERACTIONS
-// ==========================================
 const chatInput = el('chatInput');
 const chatSendBtn = el('chatSendBtn');
 const chatFile = el('chatFile');
@@ -853,7 +825,7 @@ if (chatInput) {
 
 if (chatFile) {
     chatFile.addEventListener('change', () => { 
-        if (chatPreviewContainer) chatPreviewContainer.style.display = chatFile.files.length > 0 ? 'block' : 'none'; 
+        if (chatPreviewContainer) chatPreviewContainer.style.display = chatFile.files.length > 0 ? 'inline-flex' : 'none'; 
         updateSendBtnState(); 
     });
 }
@@ -869,7 +841,7 @@ if (removeImgBtn) {
 if (chatSendBtn) {
     chatSendBtn.addEventListener('click', async () => {
         if (!auth.currentUser || !auth.currentUser.uid) {
-            alert("Login required");
+            showToast("System connecting, please wait...");
             return;
         }
         
@@ -920,9 +892,6 @@ if (chatSendBtn) {
     });
 }
 
-// ==========================================
-// UI & NAVIGATION
-// ==========================================
 const navItems = document.querySelectorAll('.nav-item');
 const pageSections = document.querySelectorAll('.page-section');
 navItems.forEach(item => {
@@ -945,9 +914,6 @@ navItems.forEach(item => {
     });
 });
 
-// ==========================================
-// VALIDATION & WORKFLOW
-// ==========================================
 const guildUidInput = el('guildUid');
 const uidError = el('uidError');
 const continueBtn = el('continueBtn');
@@ -994,7 +960,7 @@ const countryCards = document.querySelectorAll('.country-card');
 
 function updateQR() {
     const upiLink = `upi://pay?pa=BHARATPE.8Y0B1Q2W4G55700@fbpe&pn=ZEXI%20TOOL&am=${selectedPlanPrice}&cu=INR`;
-    if (qrImage) qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+    if (qrImage) qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiLink)}&color=000000&bgcolor=FFFFFF`;
     if (qrAmount) qrAmount.innerText = `₹${selectedPlanPrice}`;
     if (paymentPlanSelect) paymentPlanSelect.value = selectedPlanPrice.toString();
     if (qrWrapper) qrWrapper.onclick = () => window.location.href = upiLink;
@@ -1024,13 +990,10 @@ countryCards.forEach(card => {
     });
 });
 
-// ==========================================
-// PAYMENT SUBMISSION (PREVENT DUPLICATES)
-// ==========================================
 if (submitPaymentBtn) {
     submitPaymentBtn.addEventListener('click', async () => {
         if (!auth.currentUser || !auth.currentUser.uid) {
-            alert("Login required");
+            showToast("System connecting, please wait...");
             return;
         }
         const uid = auth.currentUser.uid;
@@ -1043,11 +1006,10 @@ if (submitPaymentBtn) {
         submitPaymentBtn.innerText = "SUBMITTING...";
 
         try {
-            // Check Duplicate UTR
             const txQ = query(collection(db, "transactions"), where("utr", "==", utr));
             const txSnap = await getDocs(txQ);
             
-            if(!txSnap.empty) throw new Error("Duplicate UTR Entry found!");
+            if(!txSnap.empty) throw new Error("Duplicate UTR");
 
             const enteredGameUid = guildUidInput && guildUidInput.value ? guildUidInput.value : 'N/A';
 
@@ -1065,12 +1027,12 @@ if (submitPaymentBtn) {
                 uid: uid,
                 email: email, 
                 sender: 'USER', 
-                text: `💸 Payment submitted: ₹${selectedPlanPrice}\n🧾 UTR: ${utr}\n🎮 Guild UID: ${enteredGameUid}\n\nPlease wait for verification.`, 
+                text: `Payment submitted: ₹${selectedPlanPrice}\nUTR: ${utr}\nUID: ${enteredGameUid}\n\nWaiting for verification.`, 
                 img: null, 
                 time: new Date().toISOString() 
             });
 
-            showToast("Payment Submitted! Pending Verification ✅", true);
+            showToast("Payment Submitted", true);
             utrInput.value = ''; isUtrValid = false;
             submitPaymentBtn.classList.remove('enabled');
             
@@ -1078,7 +1040,7 @@ if (submitPaymentBtn) {
             if(txNav) txNav.click();
         } catch (err) {
             console.error("Transaction Submission Error:", err);
-            showToast(err.message.includes("Duplicate") ? "Error: UTR already submitted." : "Failed to submit payment.");
+            showToast(err.message.includes("Duplicate") ? "UTR already submitted." : "Failed to submit payment.");
             submitPaymentBtn.classList.add('enabled');
         } finally {
             submitPaymentBtn.disabled = false;
@@ -1087,9 +1049,6 @@ if (submitPaymentBtn) {
     });
 }
 
-// ==========================================
-// WALLET PURCHASE / ORDER CREATION
-// ==========================================
 const modalOverlay = el('paymentModal');
 const modalStepConfirm = el('modalStepConfirm');
 const modalStepProcess = el('modalStepProcess');
@@ -1100,16 +1059,16 @@ const modalStatusMsg = el('modalStatusMsg');
 if (continueBtn) {
     continueBtn.addEventListener('click', () => {
         if (!auth.currentUser || !auth.currentUser.uid) {
-            alert("Login required");
+            showToast("System connecting, please wait...");
             return;
         }
 
         if (!isUidValid) return;
         if (walletBalance < selectedPlanPrice) { 
-            showToast("Insufficient Balance ❌ Go to Pay/Acc."); 
+            showToast("Insufficient Balance"); 
             if (walletBox) {
                 walletBox.style.borderColor = "var(--error-color)";
-                setTimeout(() => walletBox.style.borderColor = "var(--neon-glow)", 1000);
+                setTimeout(() => walletBox.style.borderColor = "rgba(255, 255, 255, 0.08)", 1000);
             }
             return; 
         }
@@ -1129,7 +1088,6 @@ if (el('btnCancel')) {
 if (el('btnProceed')) {
     el('btnProceed').addEventListener('click', async () => {
         if (!auth.currentUser || !auth.currentUser.uid) {
-            alert("Login required");
             if (modalOverlay) modalOverlay.classList.remove('active');
             return;
         }
@@ -1145,7 +1103,7 @@ if (el('btnProceed')) {
             modalSpinner.style.borderTopColor = 'var(--neon-glow)';
         }
         if (modalStatusMsg) {
-            modalStatusMsg.className = 'status-msg text-neon';
+            modalStatusMsg.className = 'status-msg text-main';
             modalStatusMsg.innerText = "Processing System...";
         }
         
@@ -1160,10 +1118,9 @@ if (el('btnProceed')) {
                 throw new Error("Insufficient Balance in Database");
             }
             
-            // Duplicate order check per UID
             const orderQ = query(collection(db, "orders"), where("gameUid", "==", enteredGameUid));
             const orderSnap = await getDocs(orderQ);
-            if (!orderSnap.empty) throw new Error("Order for this UID already exists");
+            if (!orderSnap.empty) throw new Error("Order exists");
 
             const batch = writeBatch(db);
             const newBalance = realWalletBalance - selectedPlanPrice;
@@ -1184,14 +1141,14 @@ if (el('btnProceed')) {
             setTimeout(() => {
                 if (modalStatusMsg) {
                     modalStatusMsg.className = 'status-msg text-success';
-                    modalStatusMsg.innerText = "Payment Successful ✅";
+                    modalStatusMsg.innerText = "Payment Successful";
                 }
                 if (modalSpinner) modalSpinner.style.borderTopColor = 'var(--success-color)';
                 sounds.success();
 
                 setTimeout(() => {
                     if (modalStatusMsg) {
-                        modalStatusMsg.className = 'status-msg text-neon';
+                        modalStatusMsg.className = 'status-msg text-main';
                         modalStatusMsg.innerText = "Starting Service...";
                     }
                     if (modalSpinner) modalSpinner.style.borderTopColor = 'var(--neon-glow)';
@@ -1200,7 +1157,7 @@ if (el('btnProceed')) {
                         if (modalSpinner) modalSpinner.style.display = 'none';
                         if (modalStatusMsg) {
                             modalStatusMsg.className = 'status-msg text-success';
-                            modalStatusMsg.innerHTML = "Bot Activated 🚀";
+                            modalStatusMsg.innerHTML = "System Activated";
                         }
                         sounds.success();
                         
@@ -1212,19 +1169,19 @@ if (el('btnProceed')) {
                                 const ordersNav = document.querySelector('.nav-item[data-target="section-history"]');
                                 if(ordersNav) ordersNav.click();
                             }, 500); 
-                        }, 2500);
+                        }, 2000);
 
-                    }, 1500);
-                }, 1000);
-            }, 800);
+                    }, 1200);
+                }, 800);
+            }, 600);
         } catch(error) {
             console.error("Wallet Purchase Error:", error);
             if (modalOverlay) modalOverlay.classList.remove('active');
             
             if (error.message.includes("exists")) {
-                showToast("Order for this Guild UID already exists! ❌");
+                showToast("Order for this UID already exists.");
             } else if (error.message.includes("Balance")) {
-                showToast("Server Error: Insufficient Wallet Balance ❌");
+                showToast("Insufficient Balance.");
             } else {
                 showToast("Transaction failed. Try again.");
             }
