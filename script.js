@@ -1,4 +1,3 @@
-// script.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { 
     getAuth, 
@@ -83,7 +82,7 @@ function showErrorAlert(message) {
     
     setTimeout(() => {
         toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
+        setTimeout(() => toast.remove(), 400);
     }, 3500);
 }
 
@@ -96,9 +95,9 @@ function setButtonState(btnId, state, originalText, originalIcon) {
     } 
     else if (state === 'success') {
         btn.classList.remove('loading');
-        btn.style.background = '#25d366'; 
+        btn.style.background = '#10b981'; 
         btn.querySelector('.btn-text').style.display = 'inline';
-        btn.querySelector('.btn-text').innerText = 'SUCCESS!';
+        btn.querySelector('.btn-text').innerText = 'SUCCESS';
         btn.querySelector('i').className = 'fa-solid fa-check';
         btn.querySelector('i').style.display = 'inline';
     } 
@@ -117,8 +116,11 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-pwd').value;
     const btnId = 'submit-login';
+    
+    const cfResponse = document.querySelector('#login-form [name="cf-turnstile-response"]')?.value;
 
     if(!email || !password) return showErrorAlert("Please fill in all fields.");
+    if(!cfResponse) return showErrorAlert("Please complete the security check.");
 
     setButtonState(btnId, 'loading');
 
@@ -146,10 +148,13 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     const password = document.getElementById('signup-pwd').value;
     const confirmPassword = document.getElementById('signup-pwd-confirm').value;
     const btnId = 'submit-signup';
+    
+    const cfResponse = document.querySelector('#signup-form [name="cf-turnstile-response"]')?.value;
 
     if(!email || !password || !confirmPassword) return showErrorAlert("Please fill in all fields.");
     if(password !== confirmPassword) return showErrorAlert("Passwords do not match.");
     if(password.length < 6) return showErrorAlert("Password must be at least 6 characters.");
+    if(!cfResponse) return showErrorAlert("Please complete the security check.");
 
     setButtonState(btnId, 'loading');
 
