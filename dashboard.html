@@ -61,6 +61,8 @@
     .header-titles .title { font-size: 0.95rem; font-weight: 600; color: #fff; letter-spacing: -0.01em; }
     .header-titles .subtitle { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.02em; text-transform: uppercase; margin-top: 2px; }
     
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    
     .wallet-box { 
         background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 6px 12px; 
         font-size: 0.85rem; font-weight: 500; color: #fff; display: flex; align-items: center; gap: 8px;
@@ -74,6 +76,16 @@
         50% { transform: scale(1.02); background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); } 
         100% { transform: scale(1); background: rgba(255, 255, 255, 0.03); } 
     }
+
+    .notification-wrapper { position: relative; }
+    .notification-bell { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; width: 36px; height: 36px; display: flex; justify-content: center; align-items: center; color: #a1a1aa; cursor: pointer; transition: all var(--transition-speed) var(--easing); }
+    .notification-bell:hover { color: var(--text-main); border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.05); }
+    .notif-badge { display: none; position: absolute; top: -4px; right: -4px; background: var(--primary-orange); color: #fff; font-size: 0.6rem; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; justify-content: center; align-items: center; }
+    .notif-dropdown { display: none; position: absolute; top: 44px; right: 0; width: 280px; background: rgba(9, 9, 11, 0.95); backdrop-filter: blur(12px); border: 1px solid var(--card-border); border-radius: 12px; box-shadow: var(--shadow-lg); z-index: 1000; max-height: 350px; flex-direction: column; overflow: hidden; }
+    .notif-item { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background var(--transition-speed) var(--easing); cursor: default; }
+    .notif-item:hover { background: rgba(255,255,255,0.02); }
+    .notif-time { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; }
+    .notif-message { font-size: 0.8rem; color: var(--text-main); line-height: 1.4; }
     
     .main-content { flex: 1; position: relative; width: 100%; padding: 24px; padding-bottom: 100px; }
     
@@ -300,8 +312,25 @@
                     <div class="subtitle">System Control Panel</div>
                 </div>
             </div>
-            <div class="wallet-box" id="walletBox">
-                <i class="fas fa-wallet"></i> <span id="walletAmount">₹0</span>
+            <div class="header-right">
+                <div class="notification-wrapper">
+                    <div class="notification-bell" id="notificationBell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notif-badge" id="notifBadge">0</span>
+                    </div>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div style="padding: 12px 16px; border-bottom: 1px solid var(--card-border); font-size: 0.85rem; font-weight: 600; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Notifications</span>
+                            <i class="fas fa-check-double" id="markReadBtn" style="color: var(--text-muted); cursor: pointer; font-size: 0.8rem;" title="Mark all as read"></i>
+                        </div>
+                        <div id="notifList" style="display: flex; flex-direction: column; overflow-y: auto; max-height: 300px;">
+                            <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">No notifications</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wallet-box" id="walletBox">
+                    <i class="fas fa-wallet"></i> <span id="walletAmount">₹0</span>
+                </div>
             </div>
         </header>
 
@@ -321,34 +350,34 @@
                     </div>
                     <div class="form-section">
                         <label class="input-label">SELECT PLAN</label>
-                        <div class="plans-grid">
+                        <div class="plans-grid" id="plansGrid">
                             <div class="plan-card active" data-plan="starter" data-price="350">
-                                <div class="plan-title">Starter</div>
+                                <div class="plan-title"><i class="fas fa-bolt"></i> Starter</div>
                                 <div class="plan-price">₹350</div>
                                 <div class="plan-details">4 Bots • 2L+</div>
                             </div>
                             <div class="plan-card" data-plan="mini" data-price="650">
-                                <div class="plan-title">Mini Pack</div>
+                                <div class="plan-title"><i class="fas fa-bolt"></i> Mini Pack</div>
                                 <div class="plan-price">₹650</div>
                                 <div class="plan-details">8 Bots • 5L+</div>
                             </div>
                             <div class="plan-card" data-plan="basic" data-price="950">
-                                <div class="plan-title">Basic Pack</div>
+                                <div class="plan-title"><i class="fas fa-bolt"></i> Basic Pack</div>
                                 <div class="plan-price">₹950</div>
                                 <div class="plan-details">12 Bots • 8L+</div>
                             </div>
                             <div class="plan-card" data-plan="region" data-price="1250">
-                                <div class="plan-title">Region Pack</div>
+                                <div class="plan-title"><i class="fas fa-bolt"></i> Region Pack</div>
                                 <div class="plan-price">₹1250</div>
                                 <div class="plan-details">16 Bots • 10L+</div>
                             </div>
                             <div class="plan-card" data-plan="top_region" data-price="3500">
-                                <div class="plan-title">Top Region</div>
+                                <div class="plan-title"><i class="fas fa-bolt"></i> Top Region</div>
                                 <div class="plan-price">₹3500</div>
                                 <div class="plan-details">50 Bots • 40L+</div>
                             </div>
                             <div class="plan-card" data-plan="ultra_pro_max" data-price="12000">
-                                <div class="plan-title">Ultra Max</div>
+                                <div class="plan-title"><i class="fas fa-bolt"></i> Ultra Max</div>
                                 <div class="plan-price">₹12000</div>
                                 <div class="plan-details">200 Bots • 2CR+</div>
                             </div>
@@ -520,6 +549,8 @@ let unsubUser = null;
 let unsubTx = null;
 let unsubChat = null;
 let unsubOrders = null;
+let unsubNotifs = null;
+let unsubPlans = null;
 
 const el = (id) => document.getElementById(id);
 const walletAmountEl = el('walletAmount');
@@ -527,6 +558,13 @@ const walletBox = el('walletBox');
 const userEmailDisplay = el('userEmailDisplay');
 const toastEl = el('toast');
 const toastMsg = el('toast-msg');
+
+const notificationBell = el('notificationBell');
+const notifDropdown = el('notifDropdown');
+const notifBadge = el('notifBadge');
+const notifList = el('notifList');
+const markReadBtn = el('markReadBtn');
+let unreadNotifsCount = 0;
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -555,8 +593,22 @@ const sounds = {
 document.addEventListener('click', (e) => {
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     const t = e.target;
-    if (t.tagName === 'BUTTON' || t.closest('.nav-item') || t.closest('.plan-card') || t.closest('.country-card') || t.closest('#qrWrapper') || t.closest('.chat-msg img')) {
+    if (t.tagName === 'BUTTON' || t.closest('.nav-item') || t.closest('.plan-card') || t.closest('.country-card') || t.closest('#qrWrapper') || t.closest('.chat-msg img') || t.closest('.notification-bell')) {
         sounds.click();
+    }
+    
+    if (notificationBell && notifDropdown) {
+        if (notificationBell.contains(e.target)) {
+            const isShowing = notifDropdown.style.display === 'flex';
+            notifDropdown.style.display = isShowing ? 'none' : 'flex';
+            if (!isShowing) {
+                if (notifBadge) notifBadge.style.display = 'none';
+                unreadNotifsCount = 0;
+                localStorage.setItem('zexi_last_seen_notifs', Date.now());
+            }
+        } else if (!notifDropdown.contains(e.target)) {
+            notifDropdown.style.display = 'none';
+        }
     }
 });
 
@@ -583,6 +635,8 @@ function cleanupListeners() {
     if (unsubTx) { unsubTx(); unsubTx = null; }
     if (unsubChat) { unsubChat(); unsubChat = null; }
     if (unsubOrders) { unsubOrders(); unsubOrders = null; }
+    if (unsubNotifs) { unsubNotifs(); unsubNotifs = null; }
+    if (unsubPlans) { unsubPlans(); unsubPlans = null; }
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -732,6 +786,89 @@ function initApp() {
         snap.forEach(d => ords.push(d.data()));
         ords.sort((a, b) => new Date(b.time) - new Date(a.time));
         requestAnimationFrame(() => renderOrders(ords));
+    });
+
+    const notifQuery = query(collection(db, "notifications"), where("email", "in", [userEmail, "all"]));
+    unsubNotifs = onSnapshot(notifQuery, (snap) => {
+        let notifs = [];
+        snap.forEach(d => notifs.push({id: d.id, ...d.data()}));
+        notifs.sort((a, b) => new Date(b.time) - new Date(a.time));
+        notifs = notifs.slice(0, 10);
+        
+        let newCount = 0;
+        const lastSeen = parseInt(localStorage.getItem('zexi_last_seen_notifs') || '0');
+        
+        if (notifs.length === 0) {
+            if (notifList) notifList.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">No notifications</div>';
+        } else {
+            if (notifList) {
+                notifList.innerHTML = notifs.map(n => {
+                    const notifTime = new Date(n.time);
+                    if (notifTime.getTime() > lastSeen) newCount++;
+                    const timeStr = notifTime.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+                    return `<div class="notif-item">
+                        <div class="notif-message">${n.message}</div>
+                        <div class="notif-time">${timeStr}</div>
+                    </div>`;
+                }).join('');
+            }
+        }
+        
+        unreadNotifsCount = newCount;
+        if (notifBadge) {
+            if (unreadNotifsCount > 0 && (!notifDropdown || notifDropdown.style.display !== 'flex')) {
+                notifBadge.innerText = unreadNotifsCount > 9 ? '9+' : unreadNotifsCount;
+                notifBadge.style.display = 'flex';
+                sounds.notification();
+            } else {
+                notifBadge.style.display = 'none';
+            }
+        }
+    });
+
+    unsubPlans = onSnapshot(collection(db, "plans"), (snap) => {
+        let plansData = [];
+        snap.forEach(doc => {
+            let d = doc.data();
+            if (d.active !== false) plansData.push({id: doc.id, ...d});
+        });
+        
+        if (plansData.length > 0) {
+            plansData.sort((a, b) => (a.order || 0) - (b.order || 0));
+            const plansGrid = document.getElementById('plansGrid');
+            if (plansGrid) {
+                plansGrid.innerHTML = plansData.map((p, index) => `
+                    <div class="plan-card ${index === 0 ? 'active' : ''}" data-plan="${p.id}" data-price="${p.price}">
+                        <div class="plan-title"><i class="fas fa-bolt"></i> ${p.name}</div>
+                        <div class="plan-price">₹${p.price}</div>
+                        <div class="plan-details">${p.bots} • ${p.glory}</div>
+                    </div>
+                `).join('');
+                
+                const newPlanCards = plansGrid.querySelectorAll('.plan-card');
+                newPlanCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        newPlanCards.forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                        selectedPlanPrice = parseInt(card.getAttribute('data-price'));
+                        validateForm(); 
+                        updateQR();
+                    });
+                });
+                
+                if (newPlanCards.length > 0) {
+                    selectedPlanPrice = parseInt(newPlanCards[0].getAttribute('data-price'));
+                    updateQR();
+                }
+            }
+
+            const paymentPlanSelect = document.getElementById('paymentPlanSelect');
+            if (paymentPlanSelect) {
+                paymentPlanSelect.innerHTML = plansData.map(p => `
+                    <option value="${p.price}">${p.name} - ₹${p.price}</option>
+                `).join('');
+            }
+        }
     });
 
     updateQR();
