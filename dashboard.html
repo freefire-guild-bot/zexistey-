@@ -479,6 +479,15 @@
                             <option value="3500">Top Region - ₹3500</option>
                             <option value="12000">Ultra Max - ₹12000</option>
                         </select>
+                        
+                        <div class="input-label">
+                            <span>HAVE A REDEEM CODE?</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                            <input type="text" id="promoInput" class="uid-input" placeholder="Enter Code" style="text-transform: uppercase; flex: 1;">
+                            <button id="applyPromoBtn" class="continue-btn enabled" style="width: 100px; padding: 12px 16px; margin: 0; box-shadow: none;">Apply</button>
+                        </div>
+                        <p id="promoMsg" style="font-size: 0.75rem; margin-bottom: 24px; display: none; font-weight: 500;"></p>
                         <div class="input-label">
                             <span>ENTER UTR OR TXID</span>
                             <span class="error-msg" id="utrErrorMsg">Invalid ID</span>
@@ -544,7 +553,13 @@ const storage = getStorage(app);
 let userEmail = "";
 let authUid = ""; 
 let walletBalance = 0;
+
+// Variables updated for Promo Logic
+let basePlanPrice = 350; 
 let selectedPlanPrice = 350;
+let currentDiscountPercent = 0;
+let appliedPromoCode = "";
+
 let isUidValid = false;
 let isUtrValid = false;
 
@@ -859,14 +874,14 @@ function initApp() {
                     card.addEventListener('click', () => {
                         newPlanCards.forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
-                        selectedPlanPrice = parseInt(card.getAttribute('data-price'));
+                        basePlanPrice = parseInt(card.getAttribute('data-price'));
                         validateForm(); 
                         updateQR();
                     });
                 });
                 
                 if (newPlanCards.length > 0) {
-                    selectedPlanPrice = parseInt(newPlanCards[0].getAttribute('data-price'));
+                    basePlanPrice = parseInt(newPlanCards[0].getAttribute('data-price'));
                     updateQR();
                 }
             }
@@ -895,7 +910,7 @@ function renderTransactions(txList) {
         const date = new Date(tx.time).toLocaleString('en-US', { hour12: true, month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
         return `<div class="tx-card">
             <div class="tx-row"><span class="tx-email">${tx.email}</span><span class="tx-status ${statusClass}">${tx.status}</span></div>
-            <div class="tx-row tx-details"><span>Plan: <span class="tx-highlight">₹${tx.plan}</span></span><span>UID: ${tx.gameUid || 'N/A'}</span></div>
+            <div class="tx-row tx-details"><span>Plan: <span class="tx-highlight">₹${tx.plan}</span> ${tx.promoCode ? `<span style="color:var(--success-color); font-size: 0.7rem;">(PROMO)</span>` : ''}</span><span>UID: ${tx.gameUid || 'N/A'}</span></div>
             <div class="tx-row tx-details" style="margin-bottom: 0;"><span>UTR/TxID: <span style="color: var(--text-main); font-family: 'Inter', monospace; word-break: break-all;">${tx.utr}</span></span><span style="font-size:0.75rem;">${date}</span></div>
         </div>`;
     }).join('');
@@ -1092,10 +1107,8 @@ const submitPaymentBtn = el('submitPaymentBtn');
 
 if (utrInput) {
     utrInput.addEventListener('input', debounce((e) => {
-        // Updated regex to support both UTRs and alphanumeric Binance TxIDs
         let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); 
         e.target.value = val;
-        // Binance TxIDs and UTRs are both generally long, 12 is a safe minimum barrier
         isUtrValid = val.length >= 12;
         
         if (utrErrorMsg) utrErrorMsg.style.display = isUtrValid || val.length === 0 ? 'none' : 'block';
@@ -1106,8 +1119,55 @@ if (utrInput) {
     }, 200));
 }
 
+// PROMO CODE LOGIC
+const promoInput = el('promoInput');
+const applyPromoBtn = el('applyPromoBtn');
+const promoMsg = el('promoMsg');
+
+if (applyPromoBtn) {
+    applyPromoBtn.addEventListener('click', async () => {
+        if (!auth.currentUser) return;
+        const code = promoInput.value.trim().toUpperCase();
+        if (!code) return;
+
+        applyPromoBtn.innerText = "...";
+        applyPromoBtn.disabled = true;
+
+        try {
+            const q = query(collection(db, "promo_codes"), where("code", "==", code), where("isActive", "==", true));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                promoMsg.innerText = "Invalid or Expired Code";
+                promoMsg.style.color = "var(--error-color)";
+                promoMsg.style.display = "block";
+                currentDiscountPercent = 0;
+                appliedPromoCode = "";
+                sounds.error();
+            } else {
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    currentDiscountPercent = data.discount;
+                    appliedPromoCode = code;
+                    promoMsg.innerText = `${data.discount}% Discount Applied!`;
+                    promoMsg.style.color = "var(--success-color)";
+                    promoMsg.style.display = "block";
+                    sounds.success();
+                });
+            }
+        } catch (error) {
+            console.error("Promo code error:", error);
+            showToast("Failed to check code");
+        } finally {
+            applyPromoBtn.innerText = "Apply";
+            applyPromoBtn.disabled = false;
+            updateQR(); 
+        }
+    });
+}
+
 const paymentPlanSelect = el('paymentPlanSelect');
-const paymentMethodSelect = el('paymentMethodSelect'); // Added payment method selector
+const paymentMethodSelect = el('paymentMethodSelect'); 
 const qrImage = el('qrImage');
 const qrAmount = el('qrAmount');
 const qrWrapper = el('qrWrapper');
@@ -1115,6 +1175,10 @@ const planCards = document.querySelectorAll('.plan-card');
 const countryCards = document.querySelectorAll('.country-card');
 
 function updateQR() {
+    // Math logic for discount
+    const discountAmount = (basePlanPrice * currentDiscountPercent) / 100;
+    selectedPlanPrice = Math.floor(basePlanPrice - discountAmount);
+
     const method = paymentMethodSelect ? paymentMethodSelect.value : 'upi';
 
     if (method === 'upi') {
@@ -1122,21 +1186,19 @@ function updateQR() {
         if (qrImage) qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiLink)}&color=000000&bgcolor=FFFFFF`;
         if (qrWrapper) qrWrapper.onclick = () => window.location.href = upiLink;
     } else if (method === 'binance') {
-        // Binance Pay URL based on the provided link
-        // Note: For the image to load perfectly within the standard <img> HTML tag, it is highly recommended to upload it to an image host that returns a direct link ending in .png/.jpg instead of a viewer page.
-        if (qrImage) qrImage.src = `https://i.ibb.co/q38hkp9w/Screenshot-20260415-171421-Binance.jpg`;
-        if (qrWrapper) qrWrapper.onclick = null; // No direct intent-link click functionality for Binance
+        if (qrImage) qrImage.src = `https://i.ibb.co/q38hkp9w/Screenshot-20260415-171421-Binance.jpg`; // UPDATE THIS WITH YOUR DIRECT BINANCE QR LINK (.png)
+        if (qrWrapper) qrWrapper.onclick = null; 
     }
 
     if (qrAmount) qrAmount.innerText = `₹${selectedPlanPrice}`;
-    if (paymentPlanSelect) paymentPlanSelect.value = selectedPlanPrice.toString();
+    if (paymentPlanSelect) paymentPlanSelect.value = basePlanPrice.toString(); // Keep dropdown synced with base price
 }
 
 planCards.forEach(card => {
     card.addEventListener('click', () => {
         planCards.forEach(c => c.classList.remove('active'));
         card.classList.add('active');
-        selectedPlanPrice = parseInt(card.getAttribute('data-price'));
+        basePlanPrice = parseInt(card.getAttribute('data-price'));
         validateForm(); 
         updateQR();
     });
@@ -1144,7 +1206,7 @@ planCards.forEach(card => {
 
 if (paymentPlanSelect) {
     paymentPlanSelect.addEventListener('change', (e) => { 
-        selectedPlanPrice = parseInt(e.target.value); 
+        basePlanPrice = parseInt(e.target.value); 
         updateQR(); 
     });
 }
@@ -1188,24 +1250,36 @@ if (submitPaymentBtn) {
                 uid: uid,
                 gameUid: enteredGameUid, 
                 plan: selectedPlanPrice, 
+                basePlan: basePlanPrice,
+                promoCode: appliedPromoCode, // Saved to DB
                 utr: utr, 
-                method: method, // Storing the method type in DB
+                method: method, 
                 email: email, 
                 status: "Pending", 
                 time: new Date().toISOString()
             });
             
+            const promoText = appliedPromoCode ? `\nPromo Code: ${appliedPromoCode}` : '';
+
             await addDoc(collection(db, "chats"), { 
                 uid: uid,
                 email: email, 
                 sender: 'USER', 
-                text: `Payment submitted (${method}): ₹${selectedPlanPrice}\nID/TxID: ${utr}\nUID: ${enteredGameUid}\n\nWaiting for verification.`, 
+                text: `Payment submitted (${method}): ₹${selectedPlanPrice}\nID/TxID: ${utr}\nUID: ${enteredGameUid}${promoText}\n\nWaiting for verification.`, 
                 img: null, 
                 time: new Date().toISOString() 
             });
 
             showToast("Payment Submitted", true);
             utrInput.value = ''; isUtrValid = false;
+            
+            // Reset Promo after success
+            promoInput.value = '';
+            appliedPromoCode = '';
+            currentDiscountPercent = 0;
+            promoMsg.style.display = 'none';
+            updateQR();
+
             submitPaymentBtn.classList.remove('enabled');
             
             const txNav = document.querySelector('.nav-item[data-target="section-transactions"]');
@@ -1236,11 +1310,11 @@ if (continueBtn) {
         }
 
         if (!isUidValid) return;
-        if (walletBalance < selectedPlanPrice) { 
+        if (walletBalance < basePlanPrice) { 
             showToast("Insufficient Balance"); 
             return; 
         }
-        if (confirmPriceEl) confirmPriceEl.innerText = `₹${selectedPlanPrice}`;
+        if (confirmPriceEl) confirmPriceEl.innerText = `₹${basePlanPrice}`;
         if (modalStepConfirm) modalStepConfirm.style.display = 'block'; 
         if (modalStepProcess) modalStepProcess.style.display = 'none';
         if (modalOverlay) modalOverlay.classList.add('active');
@@ -1282,7 +1356,7 @@ if (el('btnProceed')) {
             const userSnap = await getDoc(userDocRef);
             const realWalletBalance = userSnap.exists() ? (userSnap.data().wallet || 0) : 0;
             
-            if (realWalletBalance < selectedPlanPrice) {
+            if (realWalletBalance < basePlanPrice) {
                 throw new Error("Insufficient Balance in Database");
             }
             
@@ -1291,7 +1365,7 @@ if (el('btnProceed')) {
             if (!orderSnap.empty) throw new Error("Order exists");
 
             const batch = writeBatch(db);
-            const newBalance = realWalletBalance - selectedPlanPrice;
+            const newBalance = realWalletBalance - basePlanPrice;
             batch.update(userDocRef, { wallet: newBalance });
 
             const newOrderRef = doc(collection(db, "orders"));
@@ -1299,7 +1373,7 @@ if (el('btnProceed')) {
                 uid: uid,
                 email: email,
                 gameUid: enteredGameUid, 
-                plan: selectedPlanPrice, 
+                plan: basePlanPrice, 
                 status: "Active", 
                 time: new Date().toISOString()
             });
