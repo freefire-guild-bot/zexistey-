@@ -452,10 +452,19 @@
                     </div>
 
                     <div class="card-title" style="margin-bottom: 16px;">Payment</div>
+
+                    <div class="form-section" style="margin-bottom: 24px;">
+                        <label class="input-label">SELECT PAYMENT METHOD</label>
+                        <select id="paymentMethodSelect" class="uid-input">
+                            <option value="upi">UPI / BharatPe (India)</option>
+                            <option value="binance">Binance Pay (Global)</option>
+                        </select>
+                    </div>
+
                     <p style="color: var(--text-muted); text-align: center; margin-bottom: 24px; font-size: 0.85rem;">Scan OR Click QR to Pay</p>
                     <div style="text-align: center;">
                         <div id="qrWrapper" class="qr-wrapper">
-                            <img id="qrImage" src="" alt="UPI QR Code" style="width: 160px; height: 160px; display: block; border-radius: 4px;">
+                            <img id="qrImage" src="" alt="Payment QR Code" style="width: 160px; height: 160px; display: block; border-radius: 4px;">
                         </div>
                     </div>
                     <p id="qrAmount" style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-top: 24px; text-align: center; letter-spacing: -0.02em;">₹350</p>
@@ -471,13 +480,13 @@
                             <option value="12000">Ultra Max - ₹12000</option>
                         </select>
                         <div class="input-label">
-                            <span>ENTER UTR NUMBER</span>
-                            <span class="error-msg" id="utrErrorMsg">Invalid UTR</span>
+                            <span>ENTER UTR OR TXID</span>
+                            <span class="error-msg" id="utrErrorMsg">Invalid ID</span>
                         </div>
                         <div class="uid-input-wrapper">
-                            <input type="text" id="utrInput" class="uid-input" placeholder="Enter UTR (12+ characters)" maxlength="20" style="text-transform: uppercase;">
+                            <input type="text" id="utrInput" class="uid-input" placeholder="Enter UTR (12+) or TxID" maxlength="64" style="text-transform: uppercase;">
                         </div>
-                        <p style="font-size: 0.75rem; color: #71717a; margin-top: 12px; text-align: center; font-weight: 400;">Enter 12-digit UTR/Reference No. after payment</p>
+                        <p style="font-size: 0.75rem; color: #71717a; margin-top: 12px; text-align: center; font-weight: 400;">Enter 12-digit UTR or Binance TxID after payment</p>
                     </div>
                     <div class="continue-btn-container">
                         <button id="submitPaymentBtn" class="continue-btn" disabled>Submit Payment</button>
@@ -887,7 +896,7 @@ function renderTransactions(txList) {
         return `<div class="tx-card">
             <div class="tx-row"><span class="tx-email">${tx.email}</span><span class="tx-status ${statusClass}">${tx.status}</span></div>
             <div class="tx-row tx-details"><span>Plan: <span class="tx-highlight">₹${tx.plan}</span></span><span>UID: ${tx.gameUid || 'N/A'}</span></div>
-            <div class="tx-row tx-details" style="margin-bottom: 0;"><span>UTR: <span style="color: var(--text-main); font-family: 'Inter', monospace;">${tx.utr}</span></span><span style="font-size:0.75rem;">${date}</span></div>
+            <div class="tx-row tx-details" style="margin-bottom: 0;"><span>UTR/TxID: <span style="color: var(--text-main); font-family: 'Inter', monospace; word-break: break-all;">${tx.utr}</span></span><span style="font-size:0.75rem;">${date}</span></div>
         </div>`;
     }).join('');
 }
@@ -1083,8 +1092,10 @@ const submitPaymentBtn = el('submitPaymentBtn');
 
 if (utrInput) {
     utrInput.addEventListener('input', debounce((e) => {
+        // Updated regex to support both UTRs and alphanumeric Binance TxIDs
         let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); 
         e.target.value = val;
+        // Binance TxIDs and UTRs are both generally long, 12 is a safe minimum barrier
         isUtrValid = val.length >= 12;
         
         if (utrErrorMsg) utrErrorMsg.style.display = isUtrValid || val.length === 0 ? 'none' : 'block';
@@ -1096,6 +1107,7 @@ if (utrInput) {
 }
 
 const paymentPlanSelect = el('paymentPlanSelect');
+const paymentMethodSelect = el('paymentMethodSelect'); // Added payment method selector
 const qrImage = el('qrImage');
 const qrAmount = el('qrAmount');
 const qrWrapper = el('qrWrapper');
@@ -1103,11 +1115,21 @@ const planCards = document.querySelectorAll('.plan-card');
 const countryCards = document.querySelectorAll('.country-card');
 
 function updateQR() {
-    const upiLink = `upi://pay?pa=BHARATPE.8Y0B1Q2W4G55700@fbpe&pn=ZEXI%20TOOL&am=${selectedPlanPrice}&cu=INR`;
-    if (qrImage) qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiLink)}&color=000000&bgcolor=FFFFFF`;
+    const method = paymentMethodSelect ? paymentMethodSelect.value : 'upi';
+
+    if (method === 'upi') {
+        const upiLink = `upi://pay?pa=BHARATPE.8Y0B1Q2W4G55700@fbpe&pn=ZEXI%20TOOL&am=${selectedPlanPrice}&cu=INR`;
+        if (qrImage) qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiLink)}&color=000000&bgcolor=FFFFFF`;
+        if (qrWrapper) qrWrapper.onclick = () => window.location.href = upiLink;
+    } else if (method === 'binance') {
+        // Binance Pay URL based on the provided link
+        // Note: For the image to load perfectly within the standard <img> HTML tag, it is highly recommended to upload it to an image host that returns a direct link ending in .png/.jpg instead of a viewer page.
+        if (qrImage) qrImage.src = `https://i.ibb.co/q38hkp9w/Screenshot-20260415-171421-Binance.jpg`;
+        if (qrWrapper) qrWrapper.onclick = null; // No direct intent-link click functionality for Binance
+    }
+
     if (qrAmount) qrAmount.innerText = `₹${selectedPlanPrice}`;
     if (paymentPlanSelect) paymentPlanSelect.value = selectedPlanPrice.toString();
-    if (qrWrapper) qrWrapper.onclick = () => window.location.href = upiLink;
 }
 
 planCards.forEach(card => {
@@ -1125,6 +1147,10 @@ if (paymentPlanSelect) {
         selectedPlanPrice = parseInt(e.target.value); 
         updateQR(); 
     });
+}
+
+if (paymentMethodSelect) {
+    paymentMethodSelect.addEventListener('change', updateQR);
 }
 
 countryCards.forEach(card => {
@@ -1145,6 +1171,7 @@ if (submitPaymentBtn) {
 
         if (!isUtrValid) return;
         const utr = utrInput.value;
+        const method = paymentMethodSelect ? paymentMethodSelect.value.toUpperCase() : 'UPI';
         
         submitPaymentBtn.disabled = true;
         submitPaymentBtn.innerText = "Submitting...";
@@ -1162,6 +1189,7 @@ if (submitPaymentBtn) {
                 gameUid: enteredGameUid, 
                 plan: selectedPlanPrice, 
                 utr: utr, 
+                method: method, // Storing the method type in DB
                 email: email, 
                 status: "Pending", 
                 time: new Date().toISOString()
@@ -1171,7 +1199,7 @@ if (submitPaymentBtn) {
                 uid: uid,
                 email: email, 
                 sender: 'USER', 
-                text: `Payment submitted: ₹${selectedPlanPrice}\nUTR: ${utr}\nUID: ${enteredGameUid}\n\nWaiting for verification.`, 
+                text: `Payment submitted (${method}): ₹${selectedPlanPrice}\nID/TxID: ${utr}\nUID: ${enteredGameUid}\n\nWaiting for verification.`, 
                 img: null, 
                 time: new Date().toISOString() 
             });
@@ -1184,7 +1212,7 @@ if (submitPaymentBtn) {
             if(txNav) txNav.click();
         } catch (err) {
             console.error("Transaction Submission Error:", err);
-            showToast(err.message.includes("Duplicate") ? "UTR already submitted." : "Failed to submit payment.");
+            showToast(err.message.includes("Duplicate") ? "ID already submitted." : "Failed to submit payment.");
             submitPaymentBtn.classList.add('enabled');
         } finally {
             submitPaymentBtn.disabled = false;
