@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZEXI Tool Dashboard - PRO</title>
+    <title>ZEXI Tool Dashboard - PRO (Real API Enforced)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
@@ -54,17 +53,27 @@
                     <div class="card-title">Dashboard</div>
                     <div class="form-section">
                         <div class="input-label">
-                            <span>ENTER GUILD UID</span>
+                            <span>ENTER GUILD UID ✔</span>
                             <span class="error-msg" id="uidError">Invalid UID</span>
                         </div>
                         <div class="uid-input-wrapper">
                             <input type="text" id="guildUid" class="uid-input" placeholder="e.g. 1234567890" inputmode="numeric">
                         </div>
                     </div>
+                    
+                    <div class="form-section">
+                        <div class="input-label">
+                            <span>ENTER PLAYER UID ✔ <span style="color:var(--text-muted); font-size: 0.7rem; font-weight: normal;"></span></span>
+                            <span class="error-msg" id="playerUidError" style="display:none; font-weight: 600;"></span>
+                        </div>
+                        <div class="uid-input-wrapper">
+                            <input type="text" id="playerUid" class="uid-input" placeholder="e.g. 1234567890" inputmode="numeric">
+                        </div>
+                    </div>
+
                     <div class="form-section">
                         <label class="input-label">SELECT PLAN</label>
-                        <div class="plans-grid" id="plansGrid">
-                            </div>
+                        <div class="plans-grid" id="plansGrid"></div>
                     </div>
                     <div class="form-section">
                         <label class="input-label">SELECT COUNTRY</label>
@@ -115,7 +124,7 @@
 
             <div id="section-history" class="page-section">
                 <div class="dashboard-card">
-                    <div class="card-title">Order History</div>
+                    <div class="card-title">Order History / Live Panels</div>
                     <div id="ordersList" style="width:100%;">
                         <p style="color: var(--text-muted); text-align: center; font-size: 0.85rem;">Loading orders...</p>
                     </div>
@@ -154,8 +163,7 @@
 
                     <div class="form-section" style="margin-top: 32px;">
                         <label class="input-label">SELECT PLAN FOR PAYMENT</label>
-                        <select id="paymentPlanSelect" class="uid-input" style="margin-bottom: 24px;">
-                            </select>
+                        <select id="paymentPlanSelect" class="uid-input" style="margin-bottom: 24px;"></select>
                         
                         <div class="input-label">
                             <span>HAVE A REDEEM CODE?</span>
@@ -205,6 +213,15 @@
                 </div>
             </div>
         </div>
+
+        <div id="detailsModal" class="modal-overlay">
+            <div class="modal-card" style="max-height: 80vh; display: flex; flex-direction: column;">
+                <div class="modal-text" style="margin-bottom: 16px;">Verified Clan Members</div>
+                <div id="memberListContainer" style="overflow-y: auto; flex: 1; margin-bottom: 16px; padding-right: 4px;"></div>
+                <button class="btn-modal btn-cancel" onclick="document.getElementById('detailsModal').classList.remove('active')" style="width: 100%;">Close</button>
+            </div>
+        </div>
+
     </div>
 
     <script type="module" src="js/dashboard.js"></script>
