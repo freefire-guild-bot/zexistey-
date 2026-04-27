@@ -284,3 +284,149 @@ body.keyboard-open .bottom-navbar { display: none !important; }
 .account-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.06); }
 .qr-wrapper { background: #fff; padding: 16px; border-radius: 12px; cursor: pointer; box-shadow: var(--shadow-md); transition: transform var(--transition-speed) var(--easing); margin: 0 auto; display: inline-block; }
 .qr-wrapper:active { transform: scale(0.97); }
+/* ==============================================================
+   ZEXI TOOL PRO: GAMING MODAL OVERRIDE
+   ============================================================== */
+.modal-card.gaming-modal-override {
+    max-width: 380px !important;
+    background: #121212 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 16px !important;
+    padding: 24px 20px !important;
+}
+
+.gaming-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.gaming-header .icon-box {
+    width: 32px; height: 32px;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border-radius: 8px;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 0.9rem;
+}
+
+.gaming-header h2 {
+    font-size: 1.25rem;
+    color: #fff;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.gaming-steps-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.g-step-title {
+    color: #10b981;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.g-step-panel {
+    background: #18181b;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    height: 140px;
+    position: relative;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+}
+
+/* Config Panel Graphics */
+.config-panel {
+    background: linear-gradient(180deg, #1e1b4b 0%, #09090b 100%);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    align-items: center;
+    padding-top: 16px;
+}
+.gear-icon { position: absolute; top: 6px; left: 8px; font-size: 0.6rem; color: #fbbf24; }
+.guild-shield { width: 50px; height: 50px; background: #000; border-radius: 8px; padding: 2px; border: 2px solid #cbd5e1; margin-bottom: 8px; }
+.guild-shield img { width: 100%; height: 100%; border-radius: 6px; object-fit: cover; }
+.mock-uid-text { font-size: 0.5rem; color: #a1a1aa; font-family: monospace; margin-bottom: 4px; }
+.mock-progress { width: 80%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 4px; }
+.mock-progress .progress-fill { width: 40%; height: 100%; background: #fbbf24; border-radius: 2px; }
+.mock-lvl { font-size: 0.65rem; color: #fbbf24; font-weight: 700; }
+
+/* Bots Panel Graphics */
+.bots-panel {
+    background: #121214;
+    padding: 10px 8px;
+    justify-content: flex-start;
+    gap: 6px;
+}
+.set-row {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.03);
+    padding: 4px; border-radius: 4px;
+    font-size: 0.5rem; color: #71717a;
+}
+.set-row.active { border-left: 2px solid #fbbf24; background: rgba(251, 191, 36, 0.05); }
+.set-val { background: #27272a; padding: 2px 4px; border-radius: 2px; color: #a1a1aa; }
+.set-val.on { background: #fff; color: #000; font-weight: 700; }
+
+.gaming-confirm-txt {
+    font-size: 0.9rem;
+    color: #e4e4e7;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.gaming-details-box {
+    background: #09090b;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.d-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; font-size: 0.85rem; color: #a1a1aa;
+}
+.d-row:last-child { margin-bottom: 0; }
+.d-row span:last-child { font-family: monospace; color: #fff; font-size: 0.95rem; font-weight: 600; }
+.d-row.cost-row span:last-child { display: flex; align-items: center; gap: 6px; }
+
+.coin-dot {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    background: #3b82f6; box-shadow: 0 0 6px #3b82f6;
+}
+#confirmPrice { color: #10b981 !important; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; }
+
+.gaming-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-proceed-gaming {
+    width: 100%; background: #10b981; color: #000;
+    padding: 14px; border-radius: 12px;
+    font-weight: 700; font-size: 1rem; border: none;
+    cursor: pointer; transition: all 0.25s;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+.btn-proceed-gaming:hover { background: #059669; transform: translateY(-1px); }
+.btn-proceed-gaming:active { transform: scale(0.98); }
+
+.btn-cancel-gaming {
+    width: 100%; background: transparent; color: #a1a1aa;
+    padding: 14px; border-radius: 12px;
+    font-weight: 600; font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer; transition: all 0.25s;
+}
+.btn-cancel-gaming:hover { background: #27272a; color: #fff; border-color: rgba(255,255,255,0.2); }
+.btn-cancel-gaming:active { transform: scale(0.98); }
