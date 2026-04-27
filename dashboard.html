@@ -197,22 +197,95 @@
             <div class="nav-item" data-target="section-account"><i class="fas fa-wallet"></i><span>Wallet</span></div>
         </footer>
 
-        <div id="paymentModal" class="modal-overlay">
-            <div class="modal-card">
+                         <div id="paymentModal" class="modal-overlay">
+            <div class="modal-card gaming-modal-override premium-cyber-ui">
+                
                 <div id="modalStepConfirm">
-                    <div class="modal-text">Confirm Purchase</div>
-                    <div class="modal-subtext">Total Amount: <span class="modal-price-highlight" id="confirmPrice">₹0</span></div>
-                    <div class="modal-actions">
-                        <button class="btn-modal btn-cancel" id="btnCancel">Cancel</button>
-                        <button class="btn-modal btn-proceed" id="btnProceed">Proceed</button>
+                    <div class="gaming-header">
+                        <div class="icon-box neon-green-box"><i class="fas fa-rocket"></i></div>
+                        <h2>System Launch</h2>
+                    </div>
+
+                    <div class="gaming-steps-grid">
+                        <div class="g-step">
+                            <div class="g-step-title neon-text-blue">Step 1: Configure</div>
+                            <div class="g-step-panel config-panel glass-panel">
+                                <i class="fas fa-cog gear-icon spin-hover"></i>
+                                <i class="fas fa-arrow-left neon-arrow" style="color: #ef4444; position: absolute; top: 6px; left: 24px; font-size: 0.65rem;"></i>
+                                
+                                <div class="guild-shield premium-glow">
+                                    <img src="https://img.freepik.com/premium-vector/esports-logo-game-mascot_139366-1076.jpg" alt="Guild">
+                                </div>
+                                <div class="mock-uid-text">3048508470</div>
+                                <div class="mock-progress">
+                                    <div class="progress-fill cyber-orange-fill"></div>
+                                </div>
+                                <div class="mock-lvl">Lv.7 <span><i class="fas fa-users"></i></span></div>
+                            </div>
+                        </div>
+
+                        <div class="g-step">
+                            <div class="g-step-title neon-text-purple">Step 2: Allow Bots</div>
+                            <div class="g-step-panel bots-panel glass-panel">
+                                <div class="set-row"><span class="set-label"> AUTO APPROVAL </span> <span class="set-val cyber-off"> OFF</span></div>
+                                <div class="set-row"><span class="set-label"> LV.1 </span> <span class="set-val"> DEFAULT</span></div>
+                                <div class="set-row"><span class="set-label"> BR-RANKED</span> <span class="set-val"> DEFAULT</span></div>
+                                <div class="set-row"><span class="set-label"> CS-RANKED</span> <span class="set-val"> DEFAULT</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="gaming-confirm-txt">Are you sure you want to launch a new group?</p>
+
+                    <div class="gaming-details-box cyber-details">
+                        <div class="d-row">
+                            <span>REGION:</span>
+                            <span class="hud-text">🇮🇳 India</span>
+                        </div>
+                        <div class="d-row">
+                            <span>GUILD.UID</span>
+                            <span class="highlight-id hud-text neon-text-orange" id="displayClanId">Fetching...</span>
+                        </div>
+                        <div class="d-row cost-row" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; margin-top: 10px;">
+                            <span>SELECT PLAN:</span>
+                            <span class="price-tag"><span class="coin-dot"></span> <span id="confirmPrice">₹0</span></span>
+                        </div>
+                    </div>
+
+                    <div class="gaming-actions">
+                        <button class="btn-proceed-gaming cyber-btn-primary" id="btnProceed">PROCEED</button>
+                        <button class="btn-cancel-gaming cyber-btn-secondary" id="btnCancel">CANCEL</button>
                     </div>
                 </div>
+                
                 <div id="modalStepProcess" class="loader-container">
-                    <div class="spinner" id="modalSpinner"></div>
-                    <div class="status-msg text-main" id="modalStatusMsg">Processing System...</div>
+                    <div class="spinner cyber-spinner" id="modalSpinner"></div>
+                    <div class="status-msg text-main neon-text-blue" id="modalStatusMsg">Establishing Secure Connection...</div>
                 </div>
             </div>
         </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const modal = document.getElementById('paymentModal');
+                if(!modal) return;
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.target.classList.contains('active')) {
+                            const guildInput = document.getElementById('guildUid');
+                            const displayId = document.getElementById('displayClanId');
+                            if(guildInput && displayId) {
+                                displayId.innerText = guildInput.value || "Not Provided";
+                            }
+                        }
+                    });
+                });
+                observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+            });
+        </script>
+
+
+
 
         <div id="detailsModal" class="modal-overlay">
             <div class="modal-card" style="max-height: 80vh; display: flex; flex-direction: column;">
