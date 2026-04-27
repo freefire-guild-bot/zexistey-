@@ -6,7 +6,7 @@
     <title>ZEXI Tool Dashboard - PRO (Real API Enforced)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard.css?v=3">
 </head>
 <body>
 
@@ -197,7 +197,7 @@
             <div class="nav-item" data-target="section-account"><i class="fas fa-wallet"></i><span>Wallet</span></div>
         </footer>
 
-                         <div id="paymentModal" class="modal-overlay">
+        <div id="paymentModal" class="modal-overlay">
             <div class="modal-card gaming-modal-override premium-cyber-ui">
                 
                 <div id="modalStepConfirm">
@@ -213,8 +213,8 @@
                                 <i class="fas fa-cog gear-icon spin-hover"></i>
                                 <i class="fas fa-arrow-left neon-arrow" style="color: #ef4444; position: absolute; top: 6px; left: 24px; font-size: 0.65rem;"></i>
                                 
-                                <div class="guild-shield premium-glow">
-                                    <img src="https://img.freepik.com/premium-vector/esports-logo-game-mascot_139366-1076.jpg" alt="Guild">
+                                <div class="guild-shield premium-glow" style="width: 60px !important; height: 60px !important; min-height: 60px !important; max-width: 60px !important; max-height: 60px !important; margin: 0 auto 10px auto !important; overflow: hidden !important; display: flex !important; justify-content: center !important; align-items: center !important; border-radius: 12px !important; border: 1px solid rgba(96, 165, 250, 0.5) !important; flex-shrink: 0 !important; background: #000 !important;">
+                                    <img src="https://img.freepik.com/premium-vector/esports-logo-game-mascot_139366-1076.jpg" alt="Guild" style="width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 10px !important; display: block !important;">
                                 </div>
                                 <div class="mock-uid-text">3048508470</div>
                                 <div class="mock-progress">
@@ -283,9 +283,6 @@
                 observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
             });
         </script>
-
-
-
 
         <div id="detailsModal" class="modal-overlay">
             <div class="modal-card" style="max-height: 80vh; display: flex; flex-direction: column;">
