@@ -37,13 +37,26 @@ const btnTabSignup = document.getElementById('btn-tab-signup');
 const goToSignupBtn = document.getElementById('go-to-signup');
 const goToLoginBtn = document.getElementById('go-to-login');
 
+/**
+ * ========================================================
+ * 🚀 SMART TAB SWITCHING & NOTIFICATION LOGIC
+ * ========================================================
+ */
 function switchTab(tab) {
     if (tab === 'login') {
+        // Prevent toast if already on login tab
+        if(!formLogin.classList.contains('active')) {
+            showToast('info', 'AUTHENTICATION MODE', 'Switched to operator login terminal.');
+        }
         btnTabLogin.className = 'tab-btn active';
         btnTabSignup.className = 'tab-btn inactive';
         formSignup.classList.remove('active');
         formLogin.classList.add('active');
     } else {
+        // Prevent toast if already on signup tab
+        if(!formSignup.classList.contains('active')) {
+            showToast('info', 'REGISTRATION MODE', 'Initialize a new operator account.');
+        }
         btnTabSignup.className = 'tab-btn active';
         btnTabLogin.className = 'tab-btn inactive';
         formLogin.classList.remove('active');
@@ -56,6 +69,7 @@ btnTabSignup.addEventListener('click', () => switchTab('signup'));
 goToSignupBtn.addEventListener('click', () => switchTab('signup'));
 goToLoginBtn.addEventListener('click', () => switchTab('login'));
 
+// Password Toggle Logic
 const toggleIcons = document.querySelectorAll('.toggle-password');
 toggleIcons.forEach(icon => {
     icon.addEventListener('click', function() {
@@ -72,20 +86,51 @@ toggleIcons.forEach(icon => {
     });
 });
 
-function showErrorAlert(message) {
+/**
+ * ========================================================
+ * 🔔 ZEXI ELITE TOAST NOTIFICATION SYSTEM
+ * ========================================================
+ */
+function showToast(type, title, message) {
+    let container = document.getElementById('toast-container');
+    
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
     const toast = document.createElement('div');
-    toast.className = 'ui-alert-toast';
-    toast.innerText = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => toast.classList.add('show'), 10);
-    
+    toast.className = `toast toast-${type}`; 
+
+    let iconClass = 'fa-circle-info';
+    if (type === 'success') iconClass = 'fa-shield-check'; 
+    if (type === 'error') iconClass = 'fa-triangle-exclamation';
+
+    toast.innerHTML = `
+        <div class="toast-icon">
+            <i class="fa-solid ${iconClass}"></i>
+        </div>
+        <div class="toast-content">
+            <h4>${title}</h4>
+            <p>${message}</p>
+        </div>
+    `;
+
+    container.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        setTimeout(() => toast.classList.add('show'), 10);
+    });
+
     setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 400);
-    }, 3500);
+    }, 4000);
 }
 
+// Button State Manager
 function setButtonState(btnId, state, originalText, originalIcon) {
     const btn = document.getElementById(btnId);
     
@@ -95,10 +140,10 @@ function setButtonState(btnId, state, originalText, originalIcon) {
     } 
     else if (state === 'success') {
         btn.classList.remove('loading');
-        btn.style.background = '#10b981'; 
+        btn.style.background = '#00E676'; 
         btn.querySelector('.btn-text').style.display = 'inline';
-        btn.querySelector('.btn-text').innerText = 'SUCCESS';
-        btn.querySelector('i').className = 'fa-solid fa-check';
+        btn.querySelector('.btn-text').innerText = 'ACCESS GRANTED';
+        btn.querySelector('i').className = 'fa-solid fa-shield-check';
         btn.querySelector('i').style.display = 'inline';
     } 
     else if (state === 'reset') {
@@ -110,6 +155,9 @@ function setButtonState(btnId, state, originalText, originalIcon) {
     }
 }
 
+// ========================================================
+// 🔐 LOGIN LOGIC (Backend Untouched)
+// ========================================================
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -119,32 +167,37 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     
     const cfResponse = document.querySelector('#login-form [name="cf-turnstile-response"]')?.value;
 
-    if(!email || !password) return showErrorAlert("Please fill in all fields.");
-    if(!cfResponse) return showErrorAlert("Please complete the security check.");
+    if(!email || !password) return showToast('error', 'INPUT ERROR', 'Please fill in all required fields.');
+    if(!cfResponse) return showToast('error', 'SECURITY ALERT', 'Please complete the Cloudflare security check.');
 
     setButtonState(btnId, 'loading');
+    showToast('info', 'AUTHENTICATING', 'Verifying 256-bit encryption tunnel...');
 
     try {
         await signInWithEmailAndPassword(auth, email, password);
         setButtonState(btnId, 'success');
+        showToast('success', 'SYSTEM OVERRIDE', 'Secure connection established. Redirecting...');
+        
         setTimeout(() => {
             window.location.href = "dashboard.html";
-        }, 1000);
+        }, 1200);
     } catch (error) {
-        setButtonState(btnId, 'reset', 'LOGIN', 'fa-solid fa-right-to-bracket');
+        setButtonState(btnId, 'reset', 'INITIALIZE SESSION', 'fa-solid fa-arrow-right-to-bracket');
         
-        // Reset Turnstile on error so user can try again without reloading
         if (window.turnstile) turnstile.reset();
 
         const errorCode = error.code;
         if(errorCode === 'auth/invalid-credential' || errorCode === 'auth/user-not-found' || errorCode === 'auth/wrong-password') {
-            showErrorAlert("Invalid email or password.");
+            showToast('error', 'ACCESS DENIED', 'Invalid operator email or security clearance.');
         } else {
-            showErrorAlert(error.message);
+            showToast('error', 'SYSTEM ERROR', error.message);
         }
     }
 });
 
+// ========================================================
+// 📝 SIGNUP LOGIC (Backend Untouched)
+// ========================================================
 document.getElementById('signup-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -155,12 +208,13 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     
     const cfResponse = document.querySelector('#signup-form [name="cf-turnstile-response"]')?.value;
 
-    if(!email || !password || !confirmPassword) return showErrorAlert("Please fill in all fields.");
-    if(password !== confirmPassword) return showErrorAlert("Passwords do not match.");
-    if(password.length < 6) return showErrorAlert("Password must be at least 6 characters.");
-    if(!cfResponse) return showErrorAlert("Please complete the security check.");
+    if(!email || !password || !confirmPassword) return showToast('error', 'INPUT ERROR', 'Please fill in all required fields.');
+    if(password !== confirmPassword) return showToast('error', 'VERIFICATION FAILED', 'Security keys do not match.');
+    if(password.length < 6) return showToast('error', 'WEAK SECURITY', 'Security clearance must be at least 6 characters.');
+    if(!cfResponse) return showToast('error', 'SECURITY ALERT', 'Please complete the Cloudflare security check.');
 
     setButtonState(btnId, 'loading');
+    showToast('info', 'INITIALIZING', 'Establishing secure operator profile...');
 
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -173,23 +227,24 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
         });
 
         setButtonState(btnId, 'success');
+        showToast('success', 'PROFILE CREATED', 'Operator identity registered. Redirecting...');
+        
         setTimeout(() => {
             window.location.href = "dashboard.html";
-        }, 1000);
+        }, 1200);
 
     } catch (error) {
-        setButtonState(btnId, 'reset', 'SIGN UP', 'fa-solid fa-user-plus');
+        setButtonState(btnId, 'reset', 'REGISTER PROFILE', 'fa-solid fa-user-shield');
         
-        // Reset Turnstile on error
         if (window.turnstile) turnstile.reset();
 
         const errorCode = error.code;
         if(errorCode === 'auth/email-already-in-use') {
-            showErrorAlert("An account with this email already exists.");
+            showToast('error', 'IDENTITY CONFLICT', 'An operator with this email is already registered.');
         } else if(errorCode === 'auth/invalid-email') {
-            showErrorAlert("Please enter a valid email address.");
+            showToast('error', 'INVALID FORMAT', 'Please enter a valid operator email address.');
         } else {
-            showErrorAlert(error.message);
+            showToast('error', 'SYSTEM ERROR', error.message);
         }
     }
 });
